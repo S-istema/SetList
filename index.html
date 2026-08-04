@@ -3,758 +3,749 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Setlist</title>
-<!-- PWA Manifest Embutido -->
-<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiU2V0bGlzdCBBbyBWaXZvIiwic2hvcnRfbmFtZSI6IlNldGxpc3QiLCJzdGFydF91cmwiOiIuIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiIzA5MDkwYiIsInRoZW1lX2NvbG9yIjoiI2Y1OWUwYiIsImljb25zIjpbeyJzcmMiOiJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBITjJaeUIyYVdWM1FtOTRQU0l3SURBZ01UQWdNVEFpSUhodGJHNXpQU0pvZEhSd09pOHZkM2QzTG5jekxtOXlaeTh5TURBd0wzTjJaeUkrUEhKbFkzUWdkMmxrZEdnOUlqRXdJaUJvWldsbmFIUTlJakV3SWlCeWVEMGlNaUlnWm1sc2JEMGlJell3TnpCbU1pSXZQanh3YjJ4NVoyOXVJSEJ2YVc1MGN6MGlOU3d4SURZZ05DQTVJRFFnT1NBMUNJQTJJRFFNSVRRZ05DSWdabWxzYkQwaWQyaHBkR1VpTHo0OEwzTjJaejQ9Iiwic2l6ZXMiOiIxOTJ4MTkyIiwidHlwZSI6ImltYWdlL3N2Zyt4bWwifV19">
-<meta name="theme-color" content="#09090b">
+<title>SetList</title>
+<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiU2V0TGlzdCIsInNob3J0X25hbWUiOiJTZXRMaXN0Iiwic3RhcnRfdXJsIjoiLiIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiMwNDA2MGQiLCJ0aGVtZV9jb2xvciI6IiMwNDA2MGQiLCJpY29ucyI6W3sic3JjIjoiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCMmFXVjNRbTk0UFNJd0lEQWdNVEFnTVRBaUlIdGJHNXpQU0pvZEhSd09pOHZkM2QzTG5jekxtOXlaeTh5TURBd0wzTjJaeUkrUEhKbFkzUWdkMmxrZEdnOUlqRXdJaUJvWldsbmFIUTlJakV3SWlCeWVEMGlNaUlnWm1sc2JEMGlJell3TnpCbU1pSXZQanh3YjJ4NVoyOXVJSEJ2YVc1MGN6MGlOU3d4SURZZ05DQTVJRFFnT1NBMUNJQTJJRFFNSVRRZ05DSWdabWxzYkQwaSQ9In1dfQ==">
+<meta name="theme-color" content="#04060d">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.2/dist/peerjs.min.js"></script>
-<!-- Biblioteca para gerar PDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-:root{
-  --bg:#09090b;--bg2:#111113;--bg3:#19191d;
-  --card:#16161a;--border:#27272a;--border-light:#3f3f46;
-  --text:#fafafa;--text2:#a1a1aa;--text3:#71717a;
-  --accent:#f59e0b;--accent-dim:#b45309;--accent-glow:rgba(245,158,11,0.15);
-  --danger:#ef4444;--danger-dim:#991b1b;--green:#22c55e;--green-dim:#14532d;
-  --radius:14px;--radius-sm:10px;--radius-xs:8px;
-}
-*{box-sizing:border-box;margin:0;padding:0;}
-html,body{
-  background:var(--bg);color:var(--text);
-  font-family:'Space Grotesk',system-ui,sans-serif;
-  min-height:100dvh;overflow-x:hidden;
-  -webkit-tap-highlight-color:transparent;
-}
-::-webkit-scrollbar{width:4px;}
-::-webkit-scrollbar-track{background:transparent;}
-::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
-::selection{background:var(--accent);color:var(--bg);}
-input,textarea,button,select{font-family:inherit;font-size:inherit;}
-
-.glow{
-  position:fixed;top:-120px;left:50%;transform:translateX(-50%);
-  width:400px;height:400px;
-  background:radial-gradient(circle,rgba(245,158,11,0.08) 0%,transparent 70%);
-  pointer-events:none;z-index:0;
-  animation:glowFloat 8s ease-in-out infinite alternate;
-}
-@keyframes glowFloat{
-  0%{transform:translateX(-50%) translateY(0) scale(1);}
-  100%{transform:translateX(-50%) translateY(30px) scale(1.15);}
+:root {
+  --bg-deep: #03050a;
+  --bg: #04060d;
+  --surface: #0a1128;
+  --surface-2: #101d3a;
+  --surface-3: #162044;
+  --border: #1a2e52;
+  --border-light: #243b64;
+  --text: #e2e8f0;
+  --text-dim: #94a3b8;
+  --text-muted: #475569;
+  --accent: #2563eb;
+  --accent-light: #3b82f6;
+  --accent-glow: rgba(37, 99, 235, 0.2);
+  --accent-metal: #60a5fa;
+  --danger: #ef4444;
+  --success: #22c55e;
+  --r: 14px;
+  --r-sm: 10px;
+  --r-xs: 8px;
 }
 
-.app{position:relative;z-index:1;max-width:480px;margin:0 auto;padding:0 16px 140px;min-height:100dvh;}
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-.header{
-  padding:20px 0 16px;display:flex;align-items:center;justify-content:space-between;
-  position:sticky;top:0;z-index:50;
-  background:linear-gradient(to bottom,var(--bg) 60%,transparent);
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+html, body {
+  background: var(--bg-deep);
+  color: var(--text);
+  font-family: 'Inter', system-ui, sans-serif;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
 }
-.header-left{display:flex;align-items:center;gap:12px;}
-.live-dot{width:8px;height:8px;border-radius:50%;background:var(--text3);flex-shrink:0;transition:background .3s;}
-.live-dot.on{background:var(--danger);box-shadow:0 0 0 0 rgba(239,68,68,.5);animation:livePulse 2s infinite;}
-@keyframes livePulse{0%{box-shadow:0 0 0 0 rgba(239,68,68,.5);}70%{box-shadow:0 0 0 6px rgba(239,68,68,0);}100%{box-shadow:0 0 0 0 rgba(239,68,68,0);}}
-.header-title{font-weight:700;font-size:20px;letter-spacing:-.3px;}
-.header-title span{color:var(--accent);}
-.header-status{font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);letter-spacing:.5px;max-width:140px;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
-.connect-panel{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:24px 20px;margin-bottom:20px;}
-.connect-panel h2{font-size:13px;font-weight:600;color:var(--text2);letter-spacing:.5px;margin-bottom:20px;display:flex;align-items:center;gap:8px;}
-.connect-panel h2 i{color:var(--accent);font-size:14px;}
-.connect-options{display:flex;flex-direction:column;gap:12px;}
-.opt-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;transition:border-color .2s;}
-.opt-card:active{border-color:var(--accent);}
-.opt-card p{font-size:13px;color:var(--text3);line-height:1.5;margin-bottom:14px;}
-.input-row{display:flex;gap:8px;}
-input[type=text],textarea{background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:var(--radius-xs);padding:12px 14px;width:100%;transition:border-color .2s;}
-input:focus,textarea:focus{outline:none;border-color:var(--accent);}
-input::placeholder,textarea::placeholder{color:var(--text3);}
-.input-row input{flex:1;min-width:0;}
+/* Scrollbar */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:14px;border:none;border-radius:var(--radius-xs);padding:12px 20px;cursor:pointer;transition:all .15s ease;-webkit-user-select:none;user-select:none;}
-.btn:active{transform:scale(0.97);}
-.btn-accent{background:var(--accent);color:var(--bg);flex-shrink:0;}
-.btn-accent:hover{filter:brightness(1.1);}
-.btn-accent:disabled{opacity:.35;cursor:not-allowed;transform:none;}
-.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border);padding:10px 14px;font-size:13px;}
-.btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
-.btn-full{width:100%;}
-.btn-danger-ghost{background:transparent;color:var(--text3);border:none;padding:8px;font-size:12px;}
-.btn-danger-ghost:hover{color:var(--danger);}
+/* Seleção */
+::selection { background: var(--accent-light); color: #fff; }
 
-.status-bar{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
-.status-info{display:flex;flex-direction:column;gap:2px;min-width:0;}
-.status-role{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);}
-.status-code{font-family:'DM Mono',monospace;font-weight:500;font-size:16px;color:var(--text);letter-spacing:.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.status-right{display:flex;align-items:center;gap:10px;flex-shrink:0;}
-.status-peers{font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);}
+/* Inputs Globais */
+input, textarea, button, select { font-family: inherit; font-size: inherit; outline: none; }
+input, textarea, select {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: var(--r-xs);
+  padding: 12px 14px;
+  width: 100%;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+input:focus, textarea:focus, select:focus {
+  border-color: var(--accent-light);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+input::placeholder, textarea::placeholder { color: var(--text-muted); }
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  cursor: pointer;
+}
 
-/* Ações rápidas (PDF e Instalar) */
-.quick-actions{display:flex;gap:8px;margin-bottom:16px;}
-.quick-actions .btn{flex:1;font-size:12px;padding:10px 8px;}
+/* --- FUNDO ATMOSFÉRICO --- */
+.bg-effects {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+}
+.bg-orb {
+  position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.3;
+}
+.bg-orb-1 { width: 350px; height: 350px; top: -100px; left: -100px; background: var(--accent); animation: f1 20s ease-in-out infinite alternate; }
+.bg-orb-2 { width: 250px; height: 250px; bottom: 0; right: -50px; background: #1e40af; animation: f2 25s ease-in-out infinite alternate; }
+@keyframes f1 { to { transform: translate(50px, 50px) scale(1.2); } }
+@keyframes f2 { to { transform: translate(-60px, -40px) scale(0.9); } }
 
-.cats-bar{display:flex;gap:8px;overflow-x:auto;padding:4px 0 16px;-ms-overflow-style:none;scrollbar-width:none;}
-.cats-bar::-webkit-scrollbar{display:none;}
-.cat-chip{display:flex;align-items:center;gap:6px;background:var(--bg2);border:1px solid var(--border);border-radius:100px;padding:8px 14px;font-size:13px;font-weight:500;color:var(--text2);white-space:nowrap;cursor:pointer;transition:all .2s;-webkit-user-select:none;user-select:none;flex-shrink:0;}
-.cat-chip:active{transform:scale(0.96);}
-.cat-chip.active{background:var(--accent);color:var(--bg);border-color:var(--accent);}
-.cat-chip .cat-count{font-family:'DM Mono',monospace;font-size:11px;opacity:.7;}
-.cat-chip.active .cat-count{opacity:.8;}
-.cat-chip-add{background:transparent;border:1px dashed var(--border-light);color:var(--text3);padding:8px 12px;}
-.cat-chip-add:hover{border-color:var(--accent);color:var(--accent);}
+/* --- LAYOUT PRINCIPAL --- */
+.app {
+  position: relative; z-index: 1;
+  max-width: 480px; margin: 0 auto;
+  padding: 0 16px 140px;
+  min-height: 100dvh;
+}
 
-.modal-overlay{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;}
-.modal-overlay.show{opacity:1;pointer-events:all;}
-.modal-sheet{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius) var(--radius) 0 0;padding:8px 20px 32px;width:100%;max-width:480px;transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);}
-.modal-overlay.show .modal-sheet{transform:translateY(0);}
-.modal-handle{width:36px;height:4px;background:var(--border-light);border-radius:4px;margin:0 auto 20px;}
-.modal-title{font-size:17px;font-weight:700;margin-bottom:18px;}
-.modal-actions{display:flex;flex-direction:column;gap:10px;margin-top:16px;}
+/* --- HEADER --- */
+.header {
+  padding: 16px 0 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 50;
+  background: linear-gradient(to bottom, var(--bg-deep) 60%, transparent);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+}
+.logo { display: flex; align-items: center; gap: 12px; }
+.logo-icon {
+  width: 38px; height: 38px; border-radius: 10px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-light));
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 16px;
+  box-shadow: 0 4px 15px var(--accent-glow);
+}
+.logo-text { font-weight: 800; font-size: 22px; letter-spacing: -0.5px; color: #fff; }
+.header-actions { display: flex; gap: 8px; }
 
-.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
-.section-title{font-size:14px;font-weight:600;color:var(--text2);letter-spacing:.3px;}
-.section-count{font-family:'DM Mono',monospace;font-size:12px;color:var(--text3);}
+.h-btn {
+  width: 38px; height: 38px; border-radius: var(--r-sm);
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--text-dim); font-size: 15px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.2s;
+}
+.h-btn:active { transform: scale(0.92); background: var(--surface-2); }
 
-.empty-state{text-align:center;padding:48px 20px;color:var(--text3);font-size:14px;line-height:1.6;border:1px dashed var(--border);border-radius:var(--radius-sm);}
-.empty-state i{display:block;font-size:28px;margin-bottom:12px;color:var(--border-light);}
+/* --- STATS --- */
+.stats-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+  margin-bottom: 24px;
+}
+.stat-box {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r-sm); padding: 14px 10px; text-align: center;
+  position: relative; overflow: hidden;
+}
+.stat-box::after {
+  content: ''; position: absolute; bottom: 0; left: 20%; right: 20%; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent-light), transparent);
+  opacity: 0.5;
+}
+.stat-num { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 22px; color: #fff; }
+.stat-lbl { font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
 
-.song-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;margin-bottom:10px;animation:cardIn .3s ease both;transition:border-color .2s;}
-.song-card:active{border-color:var(--border-light);}
-@keyframes cardIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
-.song-main{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
-.song-info{flex:1;min-width:0;}
-.song-name{font-size:16px;font-weight:700;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.song-artist{font-size:13px;color:var(--text3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.tom-pill{font-family:'DM Mono',monospace;font-weight:500;font-size:13px;background:var(--accent-glow);color:var(--accent);border:1px solid rgba(245,158,11,0.2);padding:5px 10px;border-radius:100px;white-space:nowrap;flex-shrink:0;}
-.song-obs{margin-top:10px;font-size:13px;color:var(--text3);line-height:1.5;padding:10px 12px;background:var(--bg);border-radius:var(--radius-xs);border-left:3px solid var(--accent-dim);}
-.song-footer{display:flex;align-items:center;justify-content:space-between;margin-top:10px;}
-.song-cat-tag{font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);background:var(--bg);padding:4px 10px;border-radius:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:60%;}
-.song-del{background:none;border:none;color:var(--text3);cursor:pointer;padding:6px 8px;font-size:13px;border-radius:var(--radius-xs);transition:all .15s;}
-.song-del:hover{color:var(--danger);background:var(--danger-dim);}
-.song-del:active{transform:scale(.92);}
+/* --- CATEGORIAS --- */
+.section-label {
+  font-size: 11px; font-weight: 700; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 1.5px;
+  margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;
+}
+.btn-add-cat {
+  background: none; border: none; color: var(--accent-metal); font-size: 12px; font-weight: 600;
+  cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 4px;
+}
+.btn-add-cat:active { opacity: 0.6; }
 
-.fab{position:fixed;bottom:24px;right:24px;width:56px;height:56px;border-radius:50%;background:var(--accent);color:var(--bg);border:none;font-size:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 24px rgba(245,158,11,0.3),0 0 0 0 rgba(245,158,11,0.2);z-index:60;transition:all .2s;-webkit-user-select:none;user-select:none;}
-.fab:active{transform:scale(0.92);}
-.fab.hidden{display:none;}
+.chips-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 24px; scroll-snap-type: x mandatory; }
+.chips-scroll::-webkit-scrollbar { display: none; }
 
-.add-sheet-overlay{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;}
-.add-sheet-overlay.show{opacity:1;pointer-events:all;}
-.add-sheet{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius) var(--radius) 0 0;padding:8px 20px 36px;width:100%;max-width:480px;max-height:85dvh;overflow-y:auto;transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);}
-.add-sheet-overlay.show .add-sheet{transform:translateY(0);}
-.field{margin-bottom:14px;}
-.field label{display:block;font-size:12px;font-weight:600;color:var(--text3);letter-spacing:.5px;margin-bottom:6px;text-transform:uppercase;}
-.field-row-2{display:grid;grid-template-columns:1fr 80px;gap:10px;}
-.field select{background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:var(--radius-xs);padding:12px 14px;width:100%;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;cursor:pointer;}
-.field select:focus{outline:none;border-color:var(--accent);}
+.chip {
+  flex-shrink: 0; scroll-snap-align: start;
+  padding: 10px 16px; border-radius: 100px;
+  font-size: 13px; font-weight: 600;
+  background: var(--surface); border: 1px solid var(--border); color: var(--text-dim);
+  cursor: pointer; transition: all 0.2s; user-select: none;
+  display: flex; align-items: center; gap: 6px;
+}
+.chip:active { transform: scale(0.95); }
+.chip.active {
+  background: var(--accent); border-color: var(--accent); color: #fff;
+  box-shadow: 0 2px 10px var(--accent-glow);
+}
+.chip-cnt {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  background: rgba(255,255,255,0.15); padding: 1px 6px; border-radius: 100px;
+}
+.chip:not(.active) .chip-cnt { background: rgba(255,255,255,0.05); }
 
-.toast-container{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:8px;width:calc(100% - 32px);max-width:440px;pointer-events:none;}
-.toast{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:12px 16px;font-size:13px;font-weight:500;color:var(--text);display:flex;align-items:center;gap:10px;animation:toastIn .3s ease,toastOut .3s ease 2.2s forwards;pointer-events:all;}
-.toast i{color:var(--accent);flex-shrink:0;}
-.toast.error i{color:var(--danger);}
-@keyframes toastIn{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
-@keyframes toastOut{from{opacity:1;transform:translateY(0);}to{opacity:0;transform:translateY(-10px);}}
+/* --- LISTA --- */
+.list-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.list-title { font-size: 16px; font-weight: 700; color: #fff; }
+.list-count { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-muted); }
 
-.hint{text-align:center;color:var(--text3);font-size:13px;line-height:1.7;margin-top:40px;padding:0 20px;}
-.hidden{display:none !important;}
-@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important;}}
+.song-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-sm);
+  padding: 16px; padding-left: 20px; margin-bottom: 10px;
+  position: relative; overflow: hidden;
+  animation: slideUp 0.3s ease both;
+  transition: border-color 0.2s;
+}
+.song-card::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+  background: linear-gradient(to bottom, var(--accent-light), var(--accent));
+}
+.song-card:active { border-color: var(--border-light); }
+
+@keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.sc-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.sc-info { flex: 1; min-width: 0; }
+.sc-name { font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sc-artist { font-size: 12px; color: var(--text-muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.sc-tags { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+.tag {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500;
+  padding: 4px 10px; border-radius: 6px;
+}
+.tag-tom { background: var(--accent-glow); color: var(--accent-metal); border: 1px solid rgba(37, 99, 235, 0.3); }
+.tag-cat { background: var(--surface-2); color: var(--text-dim); border: 1px solid var(--border); }
+.tag-ord { background: var(--bg); color: var(--text-muted); }
+
+.sc-obs {
+  margin-top: 10px; font-size: 12px; color: var(--text-dim); line-height: 1.6;
+  padding: 10px 12px; background: var(--bg); border-radius: var(--r-xs);
+  border-left: 2px solid var(--border-light);
+}
+
+.sc-actions { display: flex; justify-content: flex-end; margin-top: 8px; }
+.btn-del {
+  background: none; border: none; color: var(--text-muted); font-size: 12px; font-weight: 600;
+  padding: 6px 10px; border-radius: var(--r-xs); cursor: pointer; display: flex; align-items: center; gap: 5px;
+  transition: all 0.15s;
+}
+.btn-del:active { transform: scale(0.9); color: var(--danger); background: rgba(239, 68, 68, 0.1); }
+
+.empty {
+  text-align: center; padding: 60px 20px; color: var(--text-muted);
+  border: 1px dashed var(--border); border-radius: var(--r-sm); font-size: 14px; line-height: 1.6;
+}
+.empty i { font-size: 30px; display: block; margin-bottom: 14px; color: var(--border-light); }
+
+/* --- FAB --- */
+.fab {
+  position: fixed; bottom: 28px; right: 20px;
+  width: 56px; height: 56px; border-radius: 16px;
+  background: linear-gradient(135deg, var(--accent-light), var(--accent));
+  color: #fff; border: none; font-size: 20px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; z-index: 60;
+  box-shadow: 0 4px 20px rgba(37, 99, 235, 0.5);
+  transition: transform 0.2s;
+}
+.fab:active { transform: scale(0.9); }
+
+/* --- BOTTOM SHEETS --- */
+.overlay {
+  position: fixed; inset: 0; z-index: 100;
+  background: rgba(3, 5, 10, 0.85);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  display: flex; align-items: flex-end; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity 0.25s;
+}
+.overlay.open { opacity: 1; pointer-events: all; }
+
+.sheet {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 24px 24px 0 0; padding: 12px 20px 40px;
+  width: 100%; max-width: 480px; max-height: 90dvh; overflow-y: auto;
+  transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.overlay.open .sheet { transform: translateY(0); }
+
+.handle { width: 40px; height: 4px; background: var(--border-light); border-radius: 4px; margin: 0 auto 20px; }
+.sheet-title { font-size: 18px; font-weight: 800; margin-bottom: 20px; color: #fff; }
+
+.field { margin-bottom: 16px; }
+.field-lbl { display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.row { display: grid; gap: 10px; }
+.row-2-1 { grid-template-columns: 2fr 1fr; }
+
+.btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  font-weight: 700; font-size: 14px; border: none; border-radius: var(--r-xs);
+  padding: 14px; width: 100%; cursor: pointer; transition: all 0.15s;
+}
+.btn:active { transform: scale(0.97); }
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent-light), var(--accent));
+  color: #fff; box-shadow: 0 2px 10px var(--accent-glow);
+}
+.btn-primary:disabled { opacity: 0.3; cursor: not-allowed; transform: none; box-shadow: none; }
+.btn-sec { background: var(--surface-2); color: var(--text-dim); border: 1px solid var(--border); margin-top: 10px; }
+
+/* --- TOASTS --- */
+.toast-box { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); z-index: 300; width: calc(100% - 32px); max-width: 400px; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+.toast {
+  background: var(--surface-2); border: 1px solid var(--border-light); border-radius: var(--r-xs);
+  padding: 12px 16px; font-size: 13px; font-weight: 600; color: #fff;
+  display: flex; align-items: center; gap: 10px; pointer-events: all;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+  animation: tIn 0.3s ease, tOut 0.3s ease 2s forwards;
+}
+.toast i { font-size: 16px; }
+.toast.ok i { color: var(--success); }
+.toast.err i { color: var(--danger); }
+@keyframes tIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes tOut { to { opacity: 0; transform: translateY(-10px); } }
+
+.hidden { display: none !important; }
 </style>
 </head>
 <body>
 
-<div class="glow"></div>
-<div class="toast-container" id="toasts"></div>
+<div class="bg-effects">
+  <div class="bg-orb bg-orb-1"></div>
+  <div class="bg-orb bg-orb-2"></div>
+</div>
+<div class="toast-box" id="toasts"></div>
 
-<!-- MODAL: Nova Categoria -->
-<div class="modal-overlay" id="catModal">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <div class="modal-title">Nova categoria</div>
+<!-- Sheet: Nova Categoria -->
+<div class="overlay" id="ovCat">
+  <div class="sheet">
+    <div class="handle"></div>
+    <div class="sheet-title">Nova Categoria</div>
     <div class="field">
-      <label>Nome da categoria</label>
-      <input type="text" id="catNameInput" placeholder="ex: Adoracao, Pop, Sertanejo...">
+      <label class="field-lbl">Nome da categoria</label>
+      <input type="text" id="inCatName" placeholder="Ex: Adoração, Sertanejo, Pop...">
     </div>
-    <div class="modal-actions">
-      <button class="btn btn-accent btn-full" id="catCreateBtn">Criar categoria</button>
-      <button class="btn btn-ghost btn-full" id="catCancelBtn">Cancelar</button>
-    </div>
+    <button class="btn btn-primary" id="btnSaveCat">Criar Categoria</button>
+    <button class="btn btn-sec" id="btnCancelCat">Cancelar</button>
   </div>
 </div>
 
-<!-- SHEET: Adicionar Musica -->
-<div class="add-sheet-overlay" id="addSheet">
-  <div class="add-sheet">
-    <div class="modal-handle"></div>
-    <div class="modal-title">Adicionar musica</div>
+<!-- Sheet: Nova Música -->
+<div class="overlay" id="ovSong">
+  <div class="sheet">
+    <div class="handle"></div>
+    <div class="sheet-title">Nova Música</div>
     <div class="field">
-      <label>Nome da musica</label>
-      <input type="text" id="fName" placeholder="Nome da musica">
+      <label class="field-lbl">Nome da música</label>
+      <input type="text" id="inName" placeholder="Nome da música">
     </div>
-    <div class="field-row-2 field">
+    <div class="field row row-2-1">
       <div>
-        <label>Tom</label>
-        <input type="text" id="fTom" placeholder="ex: Am, C, Dm...">
+        <label class="field-lbl">Tom</label>
+        <input type="text" id="inTom" placeholder="Ex: Am, C...">
       </div>
       <div>
-        <label>Ordem</label>
-        <input type="text" id="fOrder" placeholder="ex: 5" inputmode="numeric">
+        <label class="field-lbl">Ordem</label>
+        <input type="text" id="inOrd" placeholder="#" inputmode="numeric">
       </div>
     </div>
     <div class="field">
-      <label>Cantor / Banda</label>
-      <input type="text" id="fArtist" placeholder="Opcional">
+      <label class="field-lbl">Artista / Banda</label>
+      <input type="text" id="inArtist" placeholder="Opcional">
     </div>
     <div class="field">
-      <label>Categoria</label>
-      <select id="fCat"></select>
+      <label class="field-lbl">Categoria</label>
+      <select id="inCat"></select>
     </div>
     <div class="field">
-      <label>Observacao</label>
-      <textarea id="fObs" rows="2" placeholder="Opcional - ex: comecar sem bateria..."></textarea>
+      <label class="field-lbl">Observação</label>
+      <textarea id="inObs" rows="2" placeholder="Opcional"></textarea>
     </div>
-    <button class="btn btn-accent btn-full" id="addBtn" disabled style="margin-top:6px;padding:14px;font-size:15px;">Adicionar</button>
+    <button class="btn btn-primary" id="btnSaveSong" disabled>Adicionar Música</button>
   </div>
 </div>
 
-<!-- APP -->
 <div class="app">
   <header class="header">
-    <div class="header-left">
-      <div class="live-dot" id="statusDot"></div>
-      <div class="header-title">Set<span>list</span></div>
+    <div class="logo">
+      <div class="logo-icon"><i class="fa-solid fa-list-ol"></i></div>
+      <div class="logo-text">SetList</div>
     </div>
-    <div class="header-status" id="headerStatus">desconectado</div>
+    <div class="header-actions">
+      <button class="h-btn" id="btnPdf" title="Exportar PDF"><i class="fa-solid fa-file-pdf"></i></button>
+      <button class="h-btn hidden" id="btnInstall" title="Instalar App"><i class="fa-solid fa-download"></i></button>
+    </div>
   </header>
 
-  <div class="connect-panel" id="connectPanel">
-    <h2><i class="fa-solid fa-tower-broadcast"></i> Conexao</h2>
-    <div class="connect-options">
-      <div class="opt-card">
-        <p>Criar uma sala e convidar a banda. Voce sera o anfitriao.</p>
-        <button class="btn btn-accent btn-full" id="hostBtn"><i class="fa-solid fa-plus"></i> Criar sala</button>
-      </div>
-      <div class="opt-card">
-        <p>Ja tem um codigo? Entre na sala existente.</p>
-        <div class="input-row">
-          <input type="text" id="joinCode" placeholder="ex: solo-482">
-          <button class="btn btn-accent" id="joinBtn">Entrar</button>
-        </div>
-      </div>
-    </div>
+  <div class="stats-grid">
+    <div class="stat-box"><div class="stat-num" id="stMus">0</div><div class="stat-lbl">Músicas</div></div>
+    <div class="stat-box"><div class="stat-num" id="stCat">0</div><div class="stat-lbl">Categorias</div></div>
+    <div class="stat-box"><div class="stat-num" id="stTom">0</div><div class="stat-lbl">Tons</div></div>
   </div>
 
-  <div class="status-bar hidden" id="statusPanel">
-    <div class="status-info">
-      <div class="status-role" id="roleLabel">SALA</div>
-      <div class="status-code" id="roomCodeDisplay">—</div>
-    </div>
-    <div class="status-right">
-      <span class="status-peers" id="peerCount"></span>
-      <button class="btn btn-ghost" id="copyBtn" style="padding:8px 12px;font-size:12px;"><i class="fa-regular fa-copy"></i></button>
-    </div>
+  <div class="section-label">
+    <span>Categorias</span>
+    <button class="btn-add-cat" id="btnOpenCat"><i class="fa-solid fa-plus"></i> Nova</button>
+  </div>
+  <div class="chips-scroll" id="chips"></div>
+
+  <div class="list-head">
+    <div class="list-title" id="listTitle">Todas as Músicas</div>
+    <div class="list-count" id="listCount">0</div>
   </div>
 
-  <div id="contentArea" class="hidden">
-    
-    <div class="quick-actions">
-      <button class="btn btn-ghost" id="pdfBtn" style="color:var(--accent);border-color:var(--accent-dim);">
-        <i class="fa-solid fa-file-pdf"></i> Salvar PDF
-      </button>
-      <button class="btn btn-ghost hidden" id="installBtn">
-        <i class="fa-solid fa-download"></i> Instalar App
-      </button>
-    </div>
-
-    <div class="cats-bar" id="catsBar"></div>
-
-    <div class="section-head">
-      <div class="section-title" id="sectionTitle">Todas</div>
-      <div class="section-count" id="songCount">0 musicas</div>
-    </div>
-
-    <div id="songList"></div>
-    <div class="empty-state hidden" id="emptyState">
-      <i class="fa-regular fa-face-meh"></i>
-      Nenhuma musica nesta categoria ainda.
-    </div>
+  <div id="songList"></div>
+  <div class="empty" id="emptyMsg">
+    <i class="fa-regular fa-folder-open"></i>
+    Nenhuma música aqui ainda.<br>Toque no <strong>+</strong> para começar.
   </div>
-
-  <p class="hint" id="offlineHint">Crie uma sala ou entre em uma para montar o repertorio junto com a banda.</p>
 </div>
 
-<button class="fab hidden" id="fabBtn" aria-label="Adicionar musica"><i class="fa-solid fa-plus"></i></button>
+<button class="fab" id="fab"><i class="fa-solid fa-plus"></i></button>
 
 <script>
-(function(){
+(function() {
   "use strict";
 
-  // ==========================================
-  // 1. SERVICE WORKER PARA SEGUNDO PLANO
-  // ==========================================
-  if('serviceWorker' in navigator){
-    const swCode = `
-      const CACHE_NAME = 'setlist-v1';
-      const URLS = [
-        'https://cdn.jsdelivr.net/npm/peerjs@1.5.2/dist/peerjs.min.js',
-        'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
-        'https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap'
-      ];
-      self.addEventListener('install', e => {
-        e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(URLS)));
-        self.skipWaiting();
-      });
-      self.addEventListener('activate', e => {
-        e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))));
-        self.clients.claim();
-      });
-      self.addEventListener('fetch', e => {
-        e.respondWith(
-          caches.match(e.request).then(r => r || fetch(e.request).then(res => {
-            if(res.status === 200 && res.type === 'basic'){
-              const clone = res.clone();
-              caches.open(CACHE_NAME).then(c => c.put(e.request, clone));
-            }
-            return res;
-          })).catch(() => caches.match(e.request))
-        );
-      });
-    `;
-    const blob = new Blob([swCode], {type: 'application/javascript'});
-    const swUrl = URL.createObjectURL(blob);
-    navigator.serviceWorker.register(swUrl).catch(() => {});
+  // --- Estado e Dados ---
+  let data = { cats: [], songs: [] };
+  let activeCat = "all";
+
+  const $ = id => document.getElementById(id);
+
+  // --- LocalStorage ---
+  function save() { localStorage.setItem('setlist_v1', JSON.stringify(data)); }
+  function load() {
+    try {
+      const d = JSON.parse(localStorage.getItem('setlist_v1'));
+      if (d && d.songs) data = d;
+    } catch(e) {}
   }
 
-  // ==========================================
-  // 2. PWA - INSTALAÇÃO COMO APP
-  // ==========================================
-  let deferredPrompt;
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    const installBtn = $('installBtn');
-    if(installBtn) installBtn.classList.remove('hidden');
-  });
+  // --- Toast ---
+  function toast(msg, type = 'ok') {
+    const t = document.createElement('div');
+    t.className = `toast ${type}`;
+    const icons = { ok: 'fa-circle-check', err: 'fa-circle-xmark' };
+    t.innerHTML = `<i class="fa-solid ${icons[type] || icons.ok}"></i>${msg}`;
+    $('toasts').appendChild(t);
+    setTimeout(() => t.remove(), 2500);
+  }
 
-  function handleInstall(){
-    if(!deferredPrompt) return;
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(choice => {
-      if(choice.outcome === 'accepted') toast("App instalado com sucesso!");
-      deferredPrompt = null;
-      $('installBtn').classList.add('hidden');
+  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+  function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+  // --- Estatísticas ---
+  function updateStats() {
+    $('stMus').textContent = data.songs.length;
+    $('stCat').textContent = data.cats.length;
+    const uniqueToms = new Set(data.songs.map(s => s.tom.trim().toLowerCase()));
+    $('stTom').textContent = uniqueToms.size;
+  }
+
+  // --- Categorias ---
+  function addCat(name) {
+    const c = { id: uid(), name: name.trim() };
+    data.cats.push(c);
+    save(); render();
+    return c;
+  }
+
+  function deleteCat(id) {
+    data.cats = data.cats.filter(c => c.id !== id);
+    data.songs = data.songs.filter(s => s.catId !== id);
+    if (activeCat === id) activeCat = "all";
+    save(); render();
+    toast('Categoria removida');
+  }
+
+  function renderChips() {
+    const el = $('chips');
+    el.innerHTML = '';
+
+    // Chip "Todas"
+    const all = document.createElement('div');
+    all.className = `chip${activeCat === 'all' ? ' active' : ''}`;
+    all.innerHTML = `Todas <span class="chip-cnt">${data.songs.length}</span>`;
+    all.addEventListener('click', () => { activeCat = 'all'; render(); });
+    el.appendChild(all);
+
+    // Chips das categorias
+    data.cats.forEach(c => {
+      const ch = document.createElement('div');
+      ch.className = `chip${activeCat === c.id ? ' active' : ''}`;
+      const cnt = data.songs.filter(s => s.catId === c.id).length;
+      ch.innerHTML = `${esc(c.name)} <span class="chip-cnt">${cnt}</span>`;
+
+      // Lógica de toque simples e longo (CORRIGIDA)
+      let timer = null;
+      let isLong = false;
+
+      ch.addEventListener('touchstart', () => {
+        isLong = false;
+        timer = setTimeout(() => { isLong = true; deleteCat(c.id); }, 600);
+      }, { passive: true });
+
+      ch.addEventListener('touchend', (e) => {
+        clearTimeout(timer);
+        if (!isLong) { activeCat = c.id; render(); }
+        e.preventDefault(); // Previne clique fantasma
+      });
+
+      ch.addEventListener('touchmove', () => clearTimeout(timer), { passive: true });
+
+      // Fallback para mouse (Desktop)
+      ch.addEventListener('contextmenu', (e) => { e.preventDefault(); deleteCat(c.id); });
+      ch.addEventListener('click', (e) => {
+        // No desktop, o click normal funciona porque não há touchend
+        if (!('ontouchstart' in window)) { activeCat = c.id; render(); }
+      });
+
+      el.appendChild(ch);
+    });
+
+    // Rola para o ativo
+    setTimeout(() => {
+      const active = el.querySelector('.active');
+      if (active) active.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }, 50);
+  }
+
+  function updateCatSelect() {
+    const sel = $('inCat');
+    const val = sel.value;
+    sel.innerHTML = '<option value="">Selecione...</option>';
+    data.cats.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.id; opt.textContent = c.name;
+      sel.appendChild(opt);
+    });
+    if (data.cats.find(c => c.id === val)) sel.value = val;
+  }
+
+  // --- Músicas ---
+  function getFiltered() {
+    let list = activeCat === 'all' ? [...data.songs] : data.songs.filter(s => s.catId === activeCat);
+    return list.sort((a, b) => (a.order || 999) - (b.order || 999));
+  }
+
+  function renderSongs() {
+    const list = getFiltered();
+    const el = $('songList');
+    el.innerHTML = '';
+    
+    $('emptyMsg').classList.toggle('hidden', list.length > 0);
+    $('listCount').textContent = list.length;
+
+    const catObj = data.cats.find(c => c.id === activeCat);
+    $('listTitle').textContent = activeCat === 'all' ? 'Todas as Músicas' : (catObj ? catObj.name : '—');
+
+    list.forEach((s, i) => {
+      const card = document.createElement('div');
+      card.className = 'song-card';
+      card.style.animationDelay = `${i * 0.03}s`;
+
+      const cat = data.cats.find(c => c.id === s.catId);
+      const artistH = s.artist ? `<div class="sc-artist">${esc(s.artist)}</div>` : '';
+      const obsH = s.obs ? `<div class="sc-obs">${esc(s.obs)}</div>` : '';
+      const catH = cat ? `<span class="tag tag-cat">${esc(cat.name)}</span>` : '';
+      const ordH = s.order ? `<span class="tag tag-ord">#${s.order}</span>` : '';
+
+      card.innerHTML = `
+        <div class="sc-top">
+          <div class="sc-info">
+            <div class="sc-name">${esc(s.name)}</div>
+            ${artistH}
+          </div>
+        </div>
+        <div class="sc-tags">
+          <span class="tag tag-tom">${esc(s.tom)}</span>
+          ${catH} ${ordH}
+        </div>
+        ${obsH}
+        <div class="sc-actions">
+          <button class="btn-del" aria-label="Remover"><i class="fa-solid fa-trash-can"></i> Remover</button>
+        </div>
+      `;
+
+      card.querySelector('.btn-del').addEventListener('click', () => {
+        data.songs = data.songs.filter(x => x.id !== s.id);
+        save(); render();
+        toast('Música removida');
+      });
+
+      el.appendChild(card);
     });
   }
+
+  function render() {
+    updateStats();
+    renderChips();
+    renderSongs();
+    updateCatSelect();
+  }
+
+  // --- Modal Categoria ---
+  function openCat() { $('ovCat').classList.add('open'); $('inCatName').value = ''; setTimeout(() => $('inCatName').focus(), 300); }
+  function closeCat() { $('ovCat').classList.remove('open'); }
+
+  $('btnOpenCat').addEventListener('click', openCat);
+  $('btnCancelCat').addEventListener('click', closeCat);
+  $('ovCat').addEventListener('click', e => { if (e.target === $('ovCat')) closeCat(); });
   
-  // ==========================================
-  // 3. GERAÇÃO DE PDF
-  // ==========================================
-  function generatePDF(){
-    if(songs.length === 0){ toast("Nenhuma musica para exportar", true); return; }
+  $('inCatName').addEventListener('keydown', e => { if (e.key === 'Enter') $('btnSaveCat').click(); });
+  
+  $('btnSaveCat').addEventListener('click', () => {
+    const name = $('inCatName').value.trim();
+    if (!name) { toast('Digite um nome', 'err'); return; }
+    if (data.cats.find(c => c.name.toLowerCase() === name.toLowerCase())) { toast('Essa categoria já existe', 'err'); return; }
+    addCat(name);
+    closeCat();
+    toast('Categoria criada');
+  });
+
+  // --- Modal Música ---
+  function openSong() {
+    if (data.cats.length === 0) addCat('Geral');
+    updateCatSelect();
+    $('ovSong').classList.add('open');
+    setTimeout(() => $('inName').focus(), 300);
+  }
+  function closeSong() { $('ovSong').classList.remove('open'); }
+
+  $('fab').addEventListener('click', openSong);
+  $('ovSong').addEventListener('click', e => { if (e.target === $('ovSong')) closeSong(); });
+
+  function checkForm() {
+    $('btnSaveSong').disabled = !($('inName').value.trim() && $('inTom').value.trim());
+  }
+  $('inName').addEventListener('input', checkForm);
+  $('inTom').addEventListener('input', checkForm);
+
+  $('btnSaveSong').addEventListener('click', () => {
+    const name = $('inName').value.trim();
+    const tom = $('inTom').value.trim();
+    if (!name || !tom) return;
+
+    let catId = $('inCat').value;
+    if (!catId && data.cats.length > 0) catId = data.cats[0].id;
+
+    data.songs.push({
+      id: uid(), name, tom,
+      artist: $('inArtist').value.trim(),
+      obs: $('inObs').value.trim(),
+      catId: catId || '',
+      order: parseInt($('inOrd').value) || 0
+    });
+
+    // Limpa form
+    $('inName').value = ''; $('inTom').value = ''; $('inArtist').value = '';
+    $('inObs').value = ''; $('inOrd').value = ''; checkForm();
     
+    save(); render(); closeSong();
+    toast('Música adicionada');
+  });
+
+  // --- PDF ---
+  $('btnPdf').addEventListener('click', () => {
+    if (!data.songs.length) { toast('Adicione músicas primeiro', 'err'); return; }
+
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ unit: 'mm', format: 'a4' });
-    const pageW = doc.internal.pageSize.getWidth();
-    const margin = 15;
-    let y = 20;
+    const pw = doc.internal.pageSize.getWidth();
+    const mg = 15;
+    let y = 15;
 
     // Cabeçalho
-    doc.setFillColor(9, 9, 11);
-    doc.rect(0, 0, pageW, 40, 'F');
+    doc.setFillColor(4, 6, 13); doc.rect(0, 0, pw, 35, 'F');
+    doc.setFillColor(37, 99, 235); doc.rect(0, 35, pw, 1, 'F');
     
-    doc.setTextColor(245, 158, 11);
-    doc.setFontSize(22);
-    doc.text('SETLIST', margin, y);
-    
-    doc.setTextColor(161, 161, 170);
-    doc.setFontSize(10);
-    y += 6;
-    doc.text(`Sala: ${roomCode || 'Offline'}  |  Gerado em: ${new Date().toLocaleDateString('pt-BR')}`, margin, y);
-    y += 6;
-    doc.text(`Total de musicas: ${songs.length}`, margin, y);
-    
-    y = 50;
+    doc.setTextColor(96, 165, 250); doc.setFontSize(22); doc.setFont('helvetica', 'bold');
+    doc.text('SETLIST', mg, y);
+    y += 7;
+    doc.setTextColor(148, 163, 184); doc.setFontSize(9); doc.setFont('helvetica', 'normal');
+    doc.text(`Gerado em ${new Date().toLocaleDateString('pt-BR')}  |  Total: ${data.songs.length} músicas`, mg, y);
 
-    // Agrupar por categoria
-    const catsToPrint = activeCatId === "all" ? categories : categories.filter(c => c.id === activeCatId);
+    y = 48;
+
+    // Filtrar por categoria ativa ou todas
+    const catsToPrint = activeCat === 'all' ? data.cats : data.cats.filter(c => c.id === activeCat);
     
-    if(catsToPrint.length === 0){
-      // Sem categorias, imprimir direto
-      y = printSongList(doc, songs, "Geral", y, margin, pageW);
+    if (catsToPrint.length === 0) {
+      y = printGroup(doc, data.songs, 'Geral', y, mg, pw);
     } else {
       catsToPrint.forEach(cat => {
-        const catSongs = songs.filter(s => s.catId === cat.id).sort((a,b) => (a.order||999)-(b.order||999));
-        if(catSongs.length === 0) return;
-        
-        if(y > 260){ doc.addPage(); y = 20; }
-        
-        doc.setFillColor(245, 158, 11);
-        doc.rect(margin, y, 3, 8, 'F');
-        doc.setTextColor(250, 250, 250);
-        doc.setFontSize(13);
-        doc.text(cat.name.toUpperCase(), margin + 6, y + 6);
+        const catSongs = data.songs.filter(s => s.catId === cat.id).sort((a,b) => (a.order||999) - (b.order||999));
+        if (!catSongs.length) return;
+
+        if (y > 260) { doc.addPage(); y = 20; }
+
+        doc.setFillColor(37, 99, 235); doc.rect(mg, y, pw - mg*2, 7, 'F');
+        doc.setTextColor(255, 255, 255); doc.setFontSize(10); doc.setFont('helvetica', 'bold');
+        doc.text(cat.name.toUpperCase(), mg + 4, y + 5);
         y += 12;
 
         catSongs.forEach((s, i) => {
-          if(y > 275){ doc.addPage(); y = 20; }
-          
-          // Linha de fundo zebra
-          if(i % 2 === 0){
-            doc.setFillColor(22, 22, 26);
-            doc.rect(margin, y - 4, pageW - margin*2, 14, 'F');
+          if (y > 275) { doc.addPage(); y = 20; }
+          if (i % 2 === 0) { doc.setFillColor(10, 17, 40); doc.rect(mg, y - 2, pw - mg*2, 11, 'F'); }
+
+          doc.setTextColor(226, 232, 240); doc.setFontSize(10); doc.setFont('helvetica', 'bold');
+          doc.text(s.name, mg + 4, y + 3);
+
+          doc.setTextColor(96, 165, 250); doc.setFont('helvetica', 'bold');
+          const tw = doc.getTextWidth(s.tom);
+          doc.text(s.tom, pw - mg - tw, y + 3);
+
+          if (s.artist) {
+            doc.setTextColor(71, 85, 105); doc.setFontSize(8); doc.setFont('helvetica', 'normal');
+            doc.text(s.artist, mg + 4, y + 7.5);
           }
 
-          doc.setTextColor(250, 250, 250);
-          doc.setFontSize(11);
-          doc.text(`${s.name}`, margin + 4, y + 2);
-          
-          // Tom à direita
-          doc.setTextColor(245, 158, 11);
-          doc.setFontSize(10);
-          const tomW = doc.getTextWidth(s.tom);
-          doc.text(s.tom, pageW - margin - tomW, y + 2);
-          
-          // Artista
-          if(s.artist){
-            doc.setTextColor(113, 113, 122);
-            doc.setFontSize(9);
-            doc.text(s.artist, margin + 4, y + 7);
-          }
-
-          // Observação
-          if(s.obs){
-            y += 4;
-            doc.setTextColor(113, 113, 122);
-            doc.setFontSize(8);
-            const obsLines = doc.splitTextToSize(`Obs: ${s.obs}`, pageW - margin*2 - 10);
-            doc.text(obsLines, margin + 8, y);
-            y += (obsLines.length * 3.5);
-          }
-
-          y += 10;
+          y += s.artist ? 14 : 11;
         });
-        y += 6;
+        y += 8;
       });
     }
 
     // Rodapé
-    const pageCount = doc.internal.getNumberOfPages();
-    for(let i = 1; i <= pageCount; i++){
+    for (let i = 1; i <= doc.internal.getNumberOfPages(); i++) {
       doc.setPage(i);
-      doc.setTextColor(113, 113, 122);
-      doc.setFontSize(8);
-      doc.text(`Pagina ${i} de ${pageCount}`, pageW/2, 290, { align: 'center' });
+      doc.setTextColor(71, 85, 105); doc.setFontSize(8); doc.setFont('helvetica', 'normal');
+      doc.text(`${i} / ${doc.internal.getNumberOfPages()}`, pw / 2, 290, { align: 'center' });
     }
 
-    const fileName = `setlist-${roomCode || 'offline'}-${Date.now()}.pdf`;
-    doc.save(fileName);
-    toast("PDF salvo com sucesso!");
-  }
-
-  // ==========================================
-  // ESTADO DA APLICAÇÃO
-  // ==========================================
-  let categories = [];
-  let songs = [];
-  let peer = null;
-  let isHost = false;
-  let roomCode = "";
-  let hostConn = null;
-  const guestConns = [];
-  let activeCatId = "all";
-
-  const $ = id => document.getElementById(id);
-  const statusDot = $("statusDot");
-  const headerStatus = $("headerStatus");
-  const connectPanel = $("connectPanel");
-  const statusPanel = $("statusPanel");
-  const roleLabel = $("roleLabel");
-  const roomCodeDisplay = $("roomCodeDisplay");
-  const peerCountEl = $("peerCount");
-  const contentArea = $("contentArea");
-  const catsBar = $("catsBar");
-  const sectionTitle = $("sectionTitle");
-  const songCountEl = $("songCount");
-  const songListEl = $("songList");
-  const emptyState = $("emptyState");
-  const offlineHint = $("offlineHint");
-  const fabBtn = $("fabBtn");
-  const addSheet = $("addSheet");
-  const catModal = $("catModal");
-  const addBtn = $("addBtn");
-  const fName = $("fName");
-  const fTom = $("fTom");
-  const fArtist = $("fArtist");
-  const fCat = $("fCat");
-  const fObs = $("fObs");
-  const fOrder = $("fOrder");
-
-  // Eventos de botões novos
-  $("pdfBtn").addEventListener("click", generatePDF);
-  $("installBtn").addEventListener("click", handleInstall);
-
-  // ==========================================
-  // UTILITÁRIOS
-  // ==========================================
-  function toast(msg, isError){
-    const t = document.createElement("div");
-    t.className = "toast" + (isError ? " error" : "");
-    t.innerHTML = `<i class="fa-solid ${isError?'fa-circle-exclamation':'fa-circle-check'}"></i> ${escapeHtml(msg)}`;
-    $("toasts").appendChild(t);
-    setTimeout(() => t.remove(), 2600);
-  }
-  function escapeHtml(s){ const d = document.createElement("div"); d.textContent = s; return d.innerHTML; }
-  function uid(){ return Date.now().toString(36) + "-" + Math.random().toString(36).slice(2,7); }
-
-  // ==========================================
-  // CATEGORIAS
-  // ==========================================
-  function addCategory(name){
-    const cat = { id: uid(), name: name.trim() };
-    categories.push(cat);
-    if(isHost) broadcastState();
-    renderCats();
-    updateCatSelect();
-    return cat;
-  }
-
-  function removeCategory(id){
-    categories = categories.filter(c => c.id !== id);
-    songs = songs.filter(s => s.catId !== id);
-    if(activeCatId === id) activeCatId = "all";
-    if(isHost) broadcastState();
-    renderCats(); renderSongs(); updateCatSelect();
-  }
-
-  function renderCats(){
-    catsBar.innerHTML = "";
-    const allChip = document.createElement("div");
-    allChip.className = "cat-chip" + (activeCatId === "all" ? " active" : "");
-    allChip.innerHTML = `Todas <span class="cat-count">${songs.length}</span>`;
-    allChip.addEventListener("click", () => { activeCatId = "all"; renderCats(); renderSongs(); });
-    catsBar.appendChild(allChip);
-
-    categories.forEach(cat => {
-      const chip = document.createElement("div");
-      chip.className = "cat-chip" + (activeCatId === cat.id ? " active" : "");
-      const count = songs.filter(s => s.catId === cat.id).length;
-      chip.innerHTML = `${escapeHtml(cat.name)} <span class="cat-count">${count}</span>`;
-      
-      let pressTimer = null;
-      const startPress = (e) => { e.preventDefault(); pressTimer = setTimeout(() => { if(isHost){ removeCategory(cat.id); toast("Categoria removida"); } else toast("Apenas o anfitriao pode remover", true); }, 600); };
-      const endPress = () => { clearTimeout(pressTimer); };
-      chip.addEventListener("touchstart", startPress, {passive:false});
-      chip.addEventListener("touchend", endPress);
-      chip.addEventListener("touchcancel", endPress);
-      chip.addEventListener("contextmenu", (e) => { e.preventDefault(); if(isHost){ removeCategory(cat.id); toast("Categoria removida"); } else toast("Apenas o anfitriao pode remover", true); });
-      chip.addEventListener("click", (e) => { if(!pressTimer) return; activeCatId = cat.id; renderCats(); renderSongs(); });
-      catsBar.appendChild(chip);
-    });
-
-    const addChip = document.createElement("div");
-    addChip.className = "cat-chip cat-chip-add";
-    addChip.innerHTML = '<i class="fa-solid fa-plus" style="font-size:12px;"></i>';
-    addChip.addEventListener("click", openCatModal);
-    catsBar.appendChild(addChip);
-
-    requestAnimationFrame(() => { const active = catsBar.querySelector(".active"); if(active) active.scrollIntoView({behavior:"smooth", inline:"center", block:"nearest"}); });
-  }
-
-  function updateCatSelect(){
-    const val = fCat.value;
-    fCat.innerHTML = "";
-    categories.forEach(c => { const opt = document.createElement("option"); opt.value = c.id; opt.textContent = c.name; fCat.appendChild(opt); });
-    if(val && categories.find(c => c.id === val)) fCat.value = val;
-  }
-
-  // ==========================================
-  // MODAL DE CATEGORIA
-  // ==========================================
-  function openCatModal(){ catModal.classList.add("show"); $("catNameInput").value = ""; setTimeout(() => $("catNameInput").focus(), 300); }
-  function closeCatModal(){ catModal.classList.remove("show"); }
-
-  $("catCreateBtn").addEventListener("click", () => {
-    const name = $("catNameInput").value.trim();
-    if(!name){ toast("Digite um nome", true); return; }
-    if(categories.find(c => c.name.toLowerCase() === name.toLowerCase())){ toast("Ja existe essa categoria", true); return; }
-    const newCat = addCategory(name);
-    if(!isHost && hostConn && hostConn.open) hostConn.send({ type:"addCat", cat: newCat });
-    closeCatModal();
-    toast("Categoria criada");
+    doc.save(`SetList_${Date.now()}.pdf`);
+    toast('PDF baixado');
   });
 
-  $("catCancelBtn").addEventListener("click", closeCatModal);
-  catModal.addEventListener("click", (e) => { if(e.target === catModal) closeCatModal(); });
-  $("catNameInput").addEventListener("keydown", (e) => { if(e.key === "Enter") $("catCreateBtn").click(); });
-
-  // ==========================================
-  // MÚSICAS
-  // ==========================================
-  function getFilteredSongs(){
-    let list = activeCatId === "all" ? [...songs] : songs.filter(s => s.catId === activeCatId);
-    list.sort((a, b) => (a.order || 999) - (b.order || 999));
-    return list;
-  }
-
-  function renderSongs(){
-    const list = getFilteredSongs();
-    songListEl.innerHTML = "";
-    emptyState.classList.toggle("hidden", list.length > 0);
-    const catObj = categories.find(c => c.id === activeCatId);
-    sectionTitle.textContent = activeCatId === "all" ? "Todas" : (catObj ? catObj.name : "—");
-    songCountEl.textContent = `${list.length} musica${list.length===1?"":"s"}`;
-
-    list.forEach(s => {
-      const card = document.createElement("div");
-      card.className = "song-card";
-      const cat = categories.find(c => c.id === s.catId);
-      const catHtml = cat ? `<span class="song-cat-tag">${escapeHtml(cat.name)}</span>` : "";
-      const artistHtml = s.artist ? `<div class="song-artist">${escapeHtml(s.artist)}</div>` : "";
-      const obsHtml = s.obs ? `<div class="song-obs">${escapeHtml(s.obs)}</div>` : "";
-      card.innerHTML = `
-        <div class="song-main">
-          <div class="song-info">
-            <div class="song-name">${escapeHtml(s.name)}</div>
-            ${artistHtml}
-          </div>
-          <div class="tom-pill">${escapeHtml(s.tom)}</div>
-        </div>
-        ${obsHtml}
-        <div class="song-footer">
-          ${catHtml}
-          <button class="song-del" aria-label="Remover"><i class="fa-solid fa-trash-can"></i></button>
-        </div>
-      `;
-      card.querySelector(".song-del").addEventListener("click", () => removeSong(s.id));
-      songListEl.appendChild(card);
-    });
-
-    const allChip = catsBar.querySelector(".cat-chip");
-    if(allChip){ const countEl = allChip.querySelector(".cat-count"); if(countEl) countEl.textContent = songs.length; }
-  }
-
-  function addSong(){
-    const name = fName.value.trim();
-    const tom = fTom.value.trim();
-    if(!name || !tom) return;
-    let catId = fCat.value;
-    if(!catId && categories.length === 0){ const c = addCategory("Geral"); catId = c.id; }
-    else if(!catId && categories.length > 0){ catId = categories[0].id; }
-
-    const song = { id: uid(), name, tom, artist: fArtist.value.trim(), obs: fObs.value.trim(), catId, order: parseInt(fOrder.value) || (songs.length + 1) * 10 };
+  function printGroup(doc, list, title, y, mg, pw) {
+    if (y > 260) { doc.addPage(); y = 20; }
+    doc.setFillColor(37, 99, 235); doc.rect(mg, y, pw - mg*2, 7, 'F');
+    doc.setTextColor(255, 255, 255); doc.setFontSize(10); doc.setFont('helvetica', 'bold');
+    doc.text(title.toUpperCase(), mg + 4, y + 5);
+    y += 12;
     
-    if(isHost){ songs.push(song); broadcastState(); renderSongs(); renderCats(); }
-    else if(hostConn && hostConn.open){ hostConn.send({ type:"addSong", song }); }
-
-    fName.value = ""; fTom.value = ""; fArtist.value = ""; fObs.value = ""; fOrder.value = "";
-    updateAddBtn();
-    closeAddSheet();
-    toast("Musica adicionada");
-  }
-
-  function removeSong(id){
-    if(isHost){ songs = songs.filter(s => s.id !== id); broadcastState(); renderSongs(); renderCats(); }
-    else if(hostConn && hostConn.open){ hostConn.send({ type:"removeSong", id }); }
-  }
-
-  function updateAddBtn(){ addBtn.disabled = !(fName.value.trim() && fTom.value.trim()); }
-  [fName, fTom].forEach(el => el.addEventListener("input", updateAddBtn));
-
-  // ==========================================
-  // SHEET DE ADICIONAR
-  // ==========================================
-  function openAddSheet(){
-    if(categories.length === 0) addCategory("Geral");
-    updateCatSelect();
-    addSheet.classList.add("show");
-    setTimeout(() => fName.focus(), 300);
-  }
-  function closeAddSheet(){ addSheet.classList.remove("show"); }
-
-  fabBtn.addEventListener("click", openAddSheet);
-  addBtn.addEventListener("click", addSong);
-  addSheet.addEventListener("click", (e) => { if(e.target === addSheet) closeAddSheet(); });
-  fObs.addEventListener("keydown", (e) => { if(e.key === "Enter" && (e.metaKey || e.ctrlKey)) addSong(); });
-
-  // ==========================================
-  // CONEXÃO PEERJS
-  // ==========================================
-  const WORDS = ["solo","riff","clave","tom","beat","palco","banda","eco","groove","refrao","bemol","pauta","acorde","ritmo","harmonia"];
-  function generateRoomCode(){ const w = WORDS[Math.floor(Math.random()*WORDS.length)]; const n = Math.floor(100 + Math.random()*899); return `${w}-${n}`; }
-  function codeToPeerId(code){ return "setlist-" + code.trim().toLowerCase().replace(/[^a-z0-9-]/g,""); }
-
-  function setStatus(text, live){ headerStatus.textContent = text; statusDot.classList.toggle("on", !!live); }
-  function showConnected(role, code){
-    connectPanel.classList.add("hidden"); statusPanel.classList.remove("hidden");
-    contentArea.classList.remove("hidden"); fabBtn.classList.remove("hidden");
-    offlineHint.classList.add("hidden"); roleLabel.textContent = role; roomCodeDisplay.textContent = code;
-  }
-  function updatePeerCount(){
-    if(isHost){ const n = guestConns.length; peerCountEl.textContent = n === 0 ? "sozinho" : `${n} online`; }
-    else { peerCountEl.textContent = hostConn && hostConn.open ? "online" : "offline"; }
-  }
-  function broadcastState(){ const payload = { type:"state", songs, categories }; guestConns.forEach(c => { if(c.open) c.send(payload); }); }
-
-  // HOST
-  function startHost(){
-    roomCode = generateRoomCode();
-    const id = codeToPeerId(roomCode);
-    setStatus("criando...", false);
-    peer = new Peer(id);
-    peer.on("open", () => { isHost = true; setStatus("sala aberta", true); showConnected("ANFITRIAO", roomCode); updatePeerCount(); renderCats(); renderSongs(); });
-    peer.on("connection", conn => {
-      guestConns.push(conn);
-      conn.on("open", () => { conn.send({ type:"state", songs, categories }); updatePeerCount(); toast("Alguem entrou na sala"); });
-      conn.on("data", data => handleHostData(data));
-      conn.on("close", () => { const i = guestConns.indexOf(conn); if(i > -1) guestConns.splice(i,1); updatePeerCount(); });
+    list.sort((a,b) => (a.order||999) - (b.order||999)).forEach((s, i) => {
+      if (y > 275) { doc.addPage(); y = 20; }
+      if (i % 2 === 0) { doc.setFillColor(10, 17, 40); doc.rect(mg, y - 2, pw - mg*2, 11, 'F'); }
+      doc.setTextColor(226, 232, 240); doc.setFontSize(10); doc.setFont('helvetica', 'bold');
+      doc.text(s.name, mg + 4, y + 3);
+      doc.setTextColor(96, 165, 250); const tw = doc.getTextWidth(s.tom); doc.text(s.tom, pw - mg - tw, y + 3);
+      if (s.artist) { doc.setTextColor(71, 85, 105); doc.setFontSize(8); doc.setFont('helvetica', 'normal'); doc.text(s.artist, mg + 4, y + 7.5); y += 14; }
+      else y += 11;
     });
-    peer.on("error", err => { console.error(err); if(err.type === "unavailable-id") startHost(); else{ setStatus("erro", false); toast("Erro de conexao", true); } });
+    return y + 8;
   }
 
-  function handleHostData(data){
-    if(data.type === "addSong"){ songs.push(data.song); broadcastState(); renderSongs(); renderCats(); }
-    else if(data.type === "removeSong"){ songs = songs.filter(s => s.id !== data.id); broadcastState(); renderSongs(); renderCats(); }
-    else if(data.type === "addCat"){ if(!categories.find(c => c.id === data.cat.id)){ categories.push(data.cat); broadcastState(); renderCats(); updateCatSelect(); } }
-    else if(data.type === "removeCat"){ categories = categories.filter(c => c.id !== data.id); songs = songs.filter(s => s.catId !== data.id); if(activeCatId === data.id) activeCatId = "all"; broadcastState(); renderCats(); renderSongs(); updateCatSelect(); }
-  }
-
-  // CONVIDADO
-  function joinRoom(){
-    const code = $("joinCode").value.trim();
-    if(!code){ toast("Digite o codigo", true); return; }
-    const targetId = codeToPeerId(code);
-    setStatus("conectando...", false);
-    peer = new Peer();
-    peer.on("open", () => {
-      hostConn = peer.connect(targetId, { reliable:true });
-      hostConn.on("open", () => { isHost = false; roomCode = code; setStatus("conectado", true); showConnected("CONVIDADO", code); updatePeerCount(); });
-      hostConn.on("data", data => { if(data.type === "state"){ songs = data.songs || []; categories = data.categories || []; renderCats(); renderSongs(); updateCatSelect(); } });
-      hostConn.on("close", () => { setStatus("host saiu", false); updatePeerCount(); toast("Conexao com o host perdida", true); });
-      hostConn.on("error", () => { setStatus("erro", false); toast("Nao foi possivel conectar", true); });
-    });
-    peer.on("error", err => { console.error(err); setStatus("nao encontrado", false); toast("Sala nao encontrada", true); });
-  }
-
-  $("hostBtn").addEventListener("click", startHost);
-  $("joinBtn").addEventListener("click", joinRoom);
-  $("joinCode").addEventListener("keydown", e => { if(e.key === "Enter") joinRoom(); });
-
-  $("copyBtn").addEventListener("click", () => {
-    navigator.clipboard.writeText(roomCode).then(() => {
-      const btn = $("copyBtn");
-      btn.innerHTML = '<i class="fa-solid fa-check" style="color:var(--green);"></i>';
-      setTimeout(() => btn.innerHTML = '<i class="fa-regular fa-copy"></i>', 1500);
-      toast("Codigo copiado");
-    });
+  // --- PWA Install ---
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    const btn = $('btnInstall');
+    btn.classList.remove('hidden');
+    btn.addEventListener('click', () => {
+      e.prompt();
+      e.userChoice.then(r => { if (r.outcome === 'accepted') toast('App instalado!'); btn.classList.add('hidden'); });
+    }, { once: true });
   });
 
-  renderCats();
-  renderSongs();
+  // --- Init ---
+  load();
+  render();
+
 })();
 </script>
 </body>
