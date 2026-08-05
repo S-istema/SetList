@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
@@ -16,6 +16,7 @@
   --bg-deep: #03050a; --bg: #04060d; --surface: #0a1128; --surface-2: #101d3a; --surface-3: #162044;
   --border: #1a2e52; --border-light: #243b64; --text: #e2e8f0; --text-dim: #94a3b8; --text-muted: #475569;
   --accent: #2563eb; --accent-light: #3b82f6; --accent-glow: rgba(37, 99, 235, 0.2); --accent-metal: #60a5fa;
+  --gold: #f59e0b; --gold-glow: rgba(245, 158, 11, 0.22);
   --danger: #ef4444; --success: #22c55e; --r: 14px; --r-sm: 10px; --r-xs: 8px;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -45,7 +46,7 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 .h-btn { width: 38px; height: 38px; border-radius: var(--r-sm); background: var(--surface); border: 1px solid var(--border); color: var(--text-dim); font-size: 15px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
 .h-btn:active { transform: scale(0.92); background: var(--surface-2); }
 
-.conn-bar { display: flex; align-items: center; justify-content: space-between; background: var(--surface); border: 1px solid var(--border); border-radius: 100px; padding: 10px 16px; margin-bottom: 20px; }
+.conn-bar { display: flex; align-items: center; justify-content: space-between; background: var(--surface); border: 1px solid var(--border); border-radius: 100px; padding: 10px 16px; margin-bottom: 16px; }
 .conn-left { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
 .conn-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted); flex-shrink: 0; transition: background 0.3s; }
 .conn-dot.on { background: var(--success); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); animation: pulse 2s infinite; }
@@ -56,6 +57,12 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 .conn-info { display: flex; flex-direction: column; min-width: 0; }
 .conn-status { font-size: 11px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
 .conn-room { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent-metal); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; padding: 2px 0; }
+
+.search-wrap { position: relative; margin-bottom: 16px; }
+.search-wrap i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 13px; pointer-events: none; }
+.search-wrap input { padding-left: 38px; }
+.search-clear { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 26px; height: 26px; border-radius: 50%; background: var(--surface-2); border: none; color: var(--text-dim); font-size: 11px; display: none; align-items: center; justify-content: center; cursor: pointer; }
+.search-clear.show { display: flex; }
 
 .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 24px; }
 .stat-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 14px 10px; text-align: center; position: relative; overflow: hidden; }
@@ -74,29 +81,47 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 .chip.active { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 2px 10px var(--accent-glow); }
 .chip-cnt { font-family: 'JetBrains Mono', monospace; font-size: 11px; background: rgba(255,255,255,0.15); padding: 1px 6px; border-radius: 100px; }
 .chip:not(.active) .chip-cnt { background: rgba(255,255,255,0.05); }
+.chip-hint { font-size: 10px; color: var(--text-muted); margin: -16px 0 20px; }
 
 .list-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
 .list-title { font-size: 16px; font-weight: 700; color: #fff; }
 .list-count { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-muted); }
 
-.song-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 16px; padding-left: 20px; margin-bottom: 10px; position: relative; overflow: hidden; animation: slideUp 0.3s ease both; transition: border-color 0.2s; }
+.song-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-sm); margin-bottom: 10px; position: relative; overflow: hidden; animation: slideUp 0.3s ease both; transition: border-color 0.2s, background 0.2s; cursor: pointer; }
 .song-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: linear-gradient(to bottom, var(--accent-light), var(--accent)); }
 .song-card:active { border-color: var(--border-light); }
+.song-card.has-lyrics:active { background: var(--surface-2); }
 @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-.sc-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.sc-body { padding: 14px 16px 12px 20px; }
+.sc-top { display: flex; align-items: center; gap: 14px; }
+.tom-badge { flex-shrink: 0; width: 54px; height: 54px; border-radius: 13px; background: linear-gradient(135deg, var(--gold), #d97706); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 4px 16px var(--gold-glow); }
+.tom-badge span { font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 17px; color: #1a1004; line-height: 1; letter-spacing: -0.5px; }
+.tom-badge small { font-size: 7px; font-weight: 700; color: rgba(26,16,4,0.6); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
 .sc-info { flex: 1; min-width: 0; }
-.sc-name { font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.sc-artist { font-size: 12px; color: var(--text-muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.sc-tags { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
-.tag { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500; padding: 4px 10px; border-radius: 6px; }
-.tag-tom { background: var(--accent-glow); color: var(--accent-metal); border: 1px solid rgba(37, 99, 235, 0.3); }
+.sc-name { font-size: 16px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sc-artist { font-size: 12.5px; color: var(--text-muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sc-chev { flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%; background: var(--bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 12px; transition: transform 0.25s ease, color 0.2s, border-color 0.2s; }
+.sc-chev.no-lyrics { opacity: 0.35; }
+.song-card.open .sc-chev { transform: rotate(180deg); color: var(--accent-metal); border-color: var(--accent-light); }
+
+.sc-tags { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+.tag { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500; padding: 4px 10px; border-radius: 6px; display: inline-flex; align-items: center; gap: 5px; }
 .tag-cat { background: var(--surface-2); color: var(--text-dim); border: 1px solid var(--border); }
 .tag-ord { background: var(--bg); color: var(--text-muted); }
+.tag-lyr { background: rgba(245, 158, 11, 0.12); color: var(--gold); border: 1px solid rgba(245, 158, 11, 0.3); font-family: 'Inter', sans-serif; font-weight: 600; }
+
+.lyrics-panel { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
+.song-card.open .lyrics-panel { max-height: 900px; }
+.lyrics-inner { padding: 4px 16px 16px 20px; }
+.lyrics-box { background: var(--bg); border-radius: var(--r-xs); border-left: 2px solid var(--gold); padding: 14px; font-size: 13.5px; line-height: 1.75; color: var(--text); white-space: pre-wrap; word-break: break-word; max-height: 340px; overflow-y: auto; }
+.lyrics-empty { color: var(--text-muted); font-style: italic; font-size: 13px; }
 .sc-obs { margin-top: 10px; font-size: 12px; color: var(--text-dim); line-height: 1.6; padding: 10px 12px; background: var(--bg); border-radius: var(--r-xs); border-left: 2px solid var(--border-light); }
-.sc-actions { display: flex; justify-content: flex-end; margin-top: 8px; }
-.btn-del { background: none; border: none; color: var(--text-muted); font-size: 12px; font-weight: 600; padding: 6px 10px; border-radius: var(--r-xs); cursor: pointer; display: flex; align-items: center; gap: 5px; transition: all 0.15s; }
-.btn-del:active { transform: scale(0.9); color: var(--danger); background: rgba(239, 68, 68, 0.1); }
+
+.sc-actions { display: flex; justify-content: flex-end; gap: 6px; padding: 0 12px 12px 20px; }
+.btn-ico { background: none; border: none; color: var(--text-muted); font-size: 12px; font-weight: 600; padding: 6px 10px; border-radius: var(--r-xs); cursor: pointer; display: flex; align-items: center; gap: 5px; transition: all 0.15s; }
+.btn-ico.edit:active { transform: scale(0.9); color: var(--accent-metal); background: var(--accent-glow); }
+.btn-ico.del:active { transform: scale(0.9); color: var(--danger); background: rgba(239, 68, 68, 0.1); }
 
 .empty { text-align: center; padding: 60px 20px; color: var(--text-muted); border: 1px dashed var(--border); border-radius: var(--r-sm); font-size: 14px; line-height: 1.6; }
 .empty i { font-size: 30px; display: block; margin-bottom: 14px; color: var(--border-light); }
@@ -112,6 +137,7 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 .sheet-title { font-size: 18px; font-weight: 800; margin-bottom: 20px; color: #fff; }
 .field { margin-bottom: 16px; }
 .field-lbl { display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.field-lbl .opt { text-transform: none; letter-spacing: 0; color: var(--text-muted); font-weight: 500; }
 .row { display: grid; gap: 10px; }
 .row-2-1 { grid-template-columns: 2fr 1fr; }
 .btn { display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; font-size: 14px; border: none; border-radius: var(--r-xs); padding: 14px; width: 100%; cursor: pointer; transition: all 0.15s; }
@@ -151,7 +177,7 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 <div class="overlay" id="ovSong">
   <div class="sheet">
     <div class="handle"></div>
-    <div class="sheet-title">Nova Musica</div>
+    <div class="sheet-title" id="songSheetTitle">Nova Musica</div>
     <div class="field">
       <label class="field-lbl">Nome da musica</label>
       <input type="text" id="inName" placeholder="Nome da musica">
@@ -169,10 +195,15 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
       <select id="inCat"></select>
     </div>
     <div class="field">
+      <label class="field-lbl">Letra <span class="opt">(opcional — toque na musica na lista pra ver)</span></label>
+      <textarea id="inLetra" rows="6" placeholder="Cole ou digite a letra aqui..."></textarea>
+    </div>
+    <div class="field">
       <label class="field-lbl">Observacao</label>
       <textarea id="inObs" rows="2" placeholder="Opcional"></textarea>
     </div>
     <button class="btn btn-primary" id="btnSaveSong" disabled>Adicionar Musica</button>
+    <button class="btn btn-sec" id="btnCancelSong">Cancelar</button>
   </div>
 </div>
 
@@ -197,6 +228,12 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
     </div>
   </div>
 
+  <div class="search-wrap">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <input type="text" id="inSearch" placeholder="Buscar musica ou artista...">
+    <button class="search-clear" id="btnClearSearch"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+
   <div class="stats-grid">
     <div class="stat-box"><div class="stat-num" id="stMus">0</div><div class="stat-lbl">Musicas</div></div>
     <div class="stat-box"><div class="stat-num" id="stCat">0</div><div class="stat-lbl">Categorias</div></div>
@@ -208,6 +245,7 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
     <button class="btn-add-cat" id="btnOpenCat"><i class="fa-solid fa-plus"></i> Nova</button>
   </div>
   <div class="chips-scroll" id="chips"></div>
+  <div class="chip-hint">Segure uma categoria pra excluir</div>
 
   <div class="list-head">
     <div class="list-title" id="listTitle">Todas as Musicas</div>
@@ -236,6 +274,9 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 
   var data = { cats: [], songs: [], ts: 0 };
   var activeCat = "all";
+  var searchTerm = "";
+  var openLyrics = {};
+  var editingId = null;
   var syncTimer = null;
   var isSyncing = false;
 
@@ -322,6 +363,18 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
     $('stTom').textContent = Object.keys(tons).length;
   }
 
+  // ---------- Busca ----------
+  $('inSearch').addEventListener('input', function() {
+    searchTerm = $('inSearch').value.trim().toLowerCase();
+    $('btnClearSearch').classList.toggle('show', searchTerm.length > 0);
+    renderSongs();
+  });
+  $('btnClearSearch').addEventListener('click', function() {
+    $('inSearch').value = ''; searchTerm = '';
+    $('btnClearSearch').classList.remove('show');
+    renderSongs(); $('inSearch').focus();
+  });
+
   // ---------- Chips ----------
   function renderChips() {
     var el = $('chips'); el.innerHTML = '';
@@ -360,21 +413,68 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
     $('listCount').textContent = list.length;
     var catObj = data.cats.find(function(c) { return c.id === activeCat; });
     $('listTitle').textContent = activeCat === 'all' ? 'Todas as Musicas' : (catObj ? catObj.name : '—');
+
+    if (list.length === 0 && searchTerm) {
+      $('emptyMsg').innerHTML = '<i class="fa-solid fa-magnifying-glass"></i>Nenhum resultado para "' + esc(searchTerm) + '".';
+      $('emptyMsg').classList.remove('hidden');
+    } else if (list.length === 0) {
+      $('emptyMsg').innerHTML = '<i class="fa-regular fa-folder-open"></i>Nenhuma musica aqui ainda.<br>Toque no <strong>+</strong> para comecar.';
+    }
+
     list.forEach(function(s, i) {
-      var card = document.createElement('div'); card.className = 'song-card'; card.style.animationDelay = (i * 0.03) + 's';
+      var hasLyrics = !!(s.letra && s.letra.trim());
+      var isOpen = !!openLyrics[s.id];
+      var card = document.createElement('div');
+      card.className = 'song-card' + (hasLyrics ? ' has-lyrics' : '') + (isOpen ? ' open' : '');
+      card.style.animationDelay = (i * 0.03) + 's';
       var cat = data.cats.find(function(c) { return c.id === s.catId; });
       var artistH = s.artist ? '<div class="sc-artist">' + esc(s.artist) + '</div>' : '';
-      var obsH = s.obs ? '<div class="sc-obs">' + esc(s.obs) + '</div>' : '';
+      var obsH = s.obs ? '<div class="sc-obs"><i class="fa-solid fa-note-sticky"></i> ' + esc(s.obs) + '</div>' : '';
       var catH = cat ? '<span class="tag tag-cat">' + esc(cat.name) + '</span>' : '';
       var ordH = s.order ? '<span class="tag tag-ord">#' + esc(String(s.order)) + '</span>' : '';
-      card.innerHTML = '<div class="sc-top"><div class="sc-info"><div class="sc-name">' + esc(s.name) + '</div>' + artistH + '</div></div><div class="sc-tags"><span class="tag tag-tom">' + esc(s.tom) + '</span>' + catH + ' ' + ordH + '</div>' + obsH + '<div class="sc-actions"><button class="btn-del" aria-label="Remover"><i class="fa-solid fa-trash-can"></i> Remover</button></div>';
-      card.querySelector('.btn-del').addEventListener('click', function() { data.songs = data.songs.filter(function(x) { return x.id !== s.id; }); saveLocal(); pushBin(); render(); toast('Removida'); });
+      var lyrH = hasLyrics ? '<span class="tag tag-lyr"><i class="fa-solid fa-align-left"></i> Letra</span>' : '';
+      var lyricsBody = hasLyrics ? esc(s.letra) : '<span class="lyrics-empty">Nenhuma letra cadastrada. Toque em editar pra adicionar.</span>';
+
+      card.innerHTML =
+        '<div class="sc-body">' +
+          '<div class="sc-top">' +
+            '<div class="tom-badge"><span>' + esc(s.tom) + '</span><small>tom</small></div>' +
+            '<div class="sc-info"><div class="sc-name">' + esc(s.name) + '</div>' + artistH + '</div>' +
+            '<div class="sc-chev' + (hasLyrics ? '' : ' no-lyrics') + '"><i class="fa-solid fa-chevron-down"></i></div>' +
+          '</div>' +
+          '<div class="sc-tags">' + lyrH + catH + ' ' + ordH + '</div>' +
+          obsH +
+        '</div>' +
+        '<div class="lyrics-panel"><div class="lyrics-inner"><div class="lyrics-box">' + lyricsBody + '</div></div></div>' +
+        '<div class="sc-actions">' +
+          '<button class="btn-ico edit"><i class="fa-solid fa-pen"></i> Editar</button>' +
+          '<button class="btn-ico del"><i class="fa-solid fa-trash-can"></i> Remover</button>' +
+        '</div>';
+
+      card.addEventListener('click', function() {
+        if (!hasLyrics) { toast('Sem letra cadastrada pra essa musica', 'err'); return; }
+        openLyrics[s.id] = !openLyrics[s.id];
+        card.classList.toggle('open');
+      });
+      card.querySelector('.edit').addEventListener('click', function(e) { e.stopPropagation(); openSong(s.id); });
+      card.querySelector('.del').addEventListener('click', function(e) {
+        e.stopPropagation();
+        data.songs = data.songs.filter(function(x) { return x.id !== s.id; });
+        delete openLyrics[s.id];
+        saveLocal(); pushBin(); render(); toast('Removida');
+      });
       el.appendChild(card);
     });
   }
 
   function getFiltered() {
     var list = activeCat === 'all' ? data.songs.slice() : data.songs.filter(function(s) { return s.catId === activeCat; });
+    if (searchTerm) {
+      list = list.filter(function(s) {
+        return (s.name && s.name.toLowerCase().indexOf(searchTerm) > -1) ||
+               (s.artist && s.artist.toLowerCase().indexOf(searchTerm) > -1);
+      });
+    }
     return list.sort(function(a, b) { return (a.order || 999) - (b.order || 999); });
   }
 
@@ -398,9 +498,38 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
   });
 
   // ---------- Musica ----------
-  function openSong() { if (data.cats.length === 0) addCat('Geral'); updateCatSelect(); $('ovSong').classList.add('open'); setTimeout(function() { $('inName').focus(); }, 300); }
-  function closeSong() { $('ovSong').classList.remove('open'); $('inName').value = ''; $('inTom').value = ''; $('inArtist').value = ''; $('inObs').value = ''; $('inOrd').value = ''; $('inCat').value = ''; checkForm(); }
-  $('fab').addEventListener('click', openSong);
+  function openSong(id) {
+    if (data.cats.length === 0) addCat('Geral');
+    updateCatSelect();
+    editingId = id || null;
+    if (editingId) {
+      var s = data.songs.find(function(x) { return x.id === editingId; });
+      if (!s) { editingId = null; }
+      else {
+        $('songSheetTitle').textContent = 'Editar Musica';
+        $('btnSaveSong').textContent = 'Salvar Alteracoes';
+        $('inName').value = s.name || '';
+        $('inTom').value = s.tom || '';
+        $('inOrd').value = s.order || '';
+        $('inArtist').value = s.artist || '';
+        $('inCat').value = s.catId || '';
+        $('inLetra').value = s.letra || '';
+        $('inObs').value = s.obs || '';
+      }
+    }
+    if (!editingId) {
+      $('songSheetTitle').textContent = 'Nova Musica';
+      $('btnSaveSong').textContent = 'Adicionar Musica';
+      $('inName').value = ''; $('inTom').value = ''; $('inOrd').value = '';
+      $('inArtist').value = ''; $('inCat').value = ''; $('inLetra').value = ''; $('inObs').value = '';
+    }
+    checkForm();
+    $('ovSong').classList.add('open');
+    setTimeout(function() { $('inName').focus(); }, 300);
+  }
+  function closeSong() { $('ovSong').classList.remove('open'); editingId = null; }
+  $('fab').addEventListener('click', function() { openSong(null); });
+  $('btnCancelSong').addEventListener('click', closeSong);
   $('ovSong').addEventListener('click', function(e) { if (e.target === $('ovSong')) closeSong(); });
   function checkForm() { $('btnSaveSong').disabled = !($('inName').value.trim() && $('inTom').value.trim()); }
   $('inName').addEventListener('input', checkForm);
@@ -410,8 +539,16 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
     if (!name || !tom) return;
     var catId = $('inCat').value;
     if (!catId && data.cats.length > 0) catId = data.cats[0].id;
-    data.songs.push({ id: uid(), name: name, tom: tom, artist: $('inArtist').value.trim(), obs: $('inObs').value.trim(), catId: catId || '', order: parseInt($('inOrd').value) || 0 });
-    saveLocal(); pushBin(); closeSong(); render(); toast('Musica adicionada');
+    var payload = { name: name, tom: tom, artist: $('inArtist').value.trim(), obs: $('inObs').value.trim(), letra: $('inLetra').value.trim(), catId: catId || '', order: parseInt($('inOrd').value) || 0 };
+    if (editingId) {
+      var s = data.songs.find(function(x) { return x.id === editingId; });
+      if (s) { Object.assign(s, payload); }
+      saveLocal(); pushBin(); closeSong(); render(); toast('Musica atualizada');
+    } else {
+      payload.id = uid();
+      data.songs.push(payload);
+      saveLocal(); pushBin(); closeSong(); render(); toast('Musica adicionada');
+    }
   });
 
   // ---------- PDF ----------
