@@ -45,8 +45,7 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 .h-btn { width: 38px; height: 38px; border-radius: var(--r-sm); background: var(--surface); border: 1px solid var(--border); color: var(--text-dim); font-size: 15px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
 .h-btn:active { transform: scale(0.92); background: var(--surface-2); }
 
-.conn-bar { display: flex; align-items: center; justify-content: space-between; background: var(--surface); border: 1px solid var(--border); border-radius: 100px; padding: 10px 16px; margin-bottom: 20px; cursor: pointer; transition: border-color 0.2s; }
-.conn-bar:active { border-color: var(--border-light); }
+.conn-bar { display: flex; align-items: center; justify-content: space-between; background: var(--surface); border: 1px solid var(--border); border-radius: 100px; padding: 10px 16px; margin-bottom: 20px; }
 .conn-left { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
 .conn-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted); flex-shrink: 0; transition: background 0.3s; }
 .conn-dot.on { background: var(--success); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); animation: pulse 2s infinite; }
@@ -57,7 +56,6 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 .conn-info { display: flex; flex-direction: column; min-width: 0; }
 .conn-status { font-size: 11px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
 .conn-room { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent-metal); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.conn-right { color: var(--text-muted); font-size: 12px; flex-shrink: 0; margin-left: 8px; }
 
 .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 24px; }
 .stat-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 14px 10px; text-align: center; position: relative; overflow: hidden; }
@@ -137,23 +135,6 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 <div class="bg-effects"><div class="bg-orb bg-orb-1"></div><div class="bg-orb bg-orb-2"></div></div>
 <div class="toast-box" id="toasts"></div>
 
-<!-- Sheet: Salas -->
-<div class="overlay" id="ovRoom">
-  <div class="sheet">
-    <div class="handle"></div>
-    <div class="sheet-title">Salas na Nuvem</div>
-    <p style="font-size:13px; color:var(--text-dim); margin-bottom:20px; line-height:1.6;">Todos na mesma sala compartilham as musicas em tempo real. Envie o codigo da sala para a banda.</p>
-    <div class="field">
-      <label class="field-lbl">Codigo da Sala (ID)</label>
-      <input type="text" id="inRoom" placeholder="Ex: 65f8a2...">
-      <div style="font-size:11px; color:var(--text-muted); margin-top:6px;">Cole aqui o ID de uma sala existente.</div>
-    </div>
-    <button class="btn btn-primary" id="btnJoinRoom">Entrar nessa Sala</button>
-    <button class="btn btn-sec" id="btnNewRoom" style="margin-top:12px;"><i class="fa-solid fa-plus"></i> Criar Sala Nova</button>
-  </div>
-</div>
-
-<!-- Sheet: Nova Categoria -->
 <div class="overlay" id="ovCat">
   <div class="sheet">
     <div class="handle"></div>
@@ -167,7 +148,6 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
   </div>
 </div>
 
-<!-- Sheet: Nova Musica -->
 <div class="overlay" id="ovSong">
   <div class="sheet">
     <div class="handle"></div>
@@ -207,7 +187,7 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
     </div>
   </header>
 
-  <div class="conn-bar" id="connBar">
+  <div class="conn-bar">
     <div class="conn-left">
       <div class="conn-dot sync" id="connDot"></div>
       <div class="conn-info">
@@ -215,7 +195,6 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
         <div class="conn-room" id="connRoom">---</div>
       </div>
     </div>
-    <div class="conn-right"><i class="fa-solid fa-cloud-arrow-up"></i></div>
   </div>
 
   <div class="stats-grid">
@@ -248,142 +227,104 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 (function() {
   "use strict";
 
-  // ==========================================
-  // CONFIGURAÇÃO JSONBIN.IO
-  // ==========================================
+  // =======================================================================
+  // 🔴 CONFIGURAÇÃO DA SALA
+  // 1. Abra o app assim (vazio). Ele vai criar uma sala e mostrar o ID.
+  // 2. Copie o ID que apareceu no toast.
+  // 3. Substitua o texto 'COLE_AQUI_O_ID_DO_SEU_BIN' pelo ID copiado.
+  // 4. Mande este arquivo para a banda. Todos conectarão direto aqui!
+  // =======================================================================
+  const GLOBAL_BIN_ID = '6a729248da38895dfebacd88'; 
+  // =======================================================================
+
   const API_KEY = '$2a$10$oxPjSemP6.ZbivpbS4Ycp.GEfwwE5bV3K7ddo522WVY38ic838lr.';
   const API_URL = 'https://api.jsonbin.io/v3';
-  const HEADERS = {
-    'Content-Type': 'application/json',
-    'X-Master-Key': API_KEY
-  };
+  const HEADERS = { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY };
 
-  // ==========================================
-  // ESTADO LOCAL
-  // ==========================================
   let data = { cats: [], songs: [], ts: 0 };
   let activeCat = "all";
-  let binId = localStorage.getItem('setlist_bin') || null;
+  let binId = null;
   let syncTimer = null;
-  let lastSync = 0;
   let isSyncing = false;
 
   const $ = id => document.getElementById(id);
 
-  // ==========================================
-  // JSONBIN: OPERAÇÕES DE REDE
-  // ==========================================
-  
-  // Cria um novo bin na nuvem e retorna o ID
   async function createBin() {
     setUI('Criando sala...', 'sync');
     try {
       const res = await fetch(`${API_URL}/b`, {
-        method: 'POST',
-        headers: HEADERS,
-        body: JSON.stringify({ cats: data.cats, songs: data.songs, ts: Date.now() })
+        method: 'POST', headers: HEADERS,
+        body: JSON.stringify({ cats: [], songs: [], ts: Date.now() })
       });
       const json = await res.json();
       binId = json.metadata.id;
-      localStorage.setItem('setlist_bin', binId);
-      setUI('Sala criada', 'on');
-      toast('Sala criada! Envie o ID para a banda');
+      setUI('Sincronizado', 'on');
+      toast('Sala criada! ID: ' + binId);
       startSync();
     } catch (e) {
       setUI('Sem internet', 'err');
-      toast('Erro ao criar sala. Verifique a internet.', 'err');
+      toast('Erro ao criar sala', 'err');
     }
   }
 
-  // Busca dados do bin (sincronização)
   async function fetchBin() {
     if (!binId || isSyncing) return;
     isSyncing = true;
     try {
       const res = await fetch(`${API_URL}/b/${binId}/latest`, { headers: HEADERS });
-      if (!res.ok) throw new Error('Bin not found');
+      if (!res.ok) throw new Error();
       const json = await res.json();
       const remote = json.record;
-      lastSync = Date.now();
-      
-      // Se o servidor tem dados mais novos que os nossos, atualizamos a tela
       if (remote.ts > data.ts) {
         data.cats = remote.cats || [];
         data.songs = remote.songs || [];
         data.ts = remote.ts;
-        saveLocal();
-        render();
+        saveLocal(); render();
       }
       setUI('Sincronizado', 'on');
-    } catch (e) {
-      setUI('Offline', 'err');
-    }
+    } catch (e) { setUI('Offline', 'err'); }
     isSyncing = false;
   }
 
-  // Envia dados locais para o bin
   async function pushBin() {
     if (!binId) return;
     data.ts = Date.now();
     try {
       await fetch(`${API_URL}/b/${binId}`, {
-        method: 'PUT',
-        headers: HEADERS,
+        method: 'PUT', headers: HEADERS,
         body: JSON.stringify({ cats: data.cats, songs: data.songs, ts: data.ts })
       });
-      lastSync = Date.now();
-      saveLocal();
-      setUI('Salvo na nuvem', 'on');
-    } catch (e) {
-      setUI('Erro ao salvar', 'err');
-      toast('Sem internet. Salvou apenas localmente.', 'err');
-    }
+      saveLocal(); setUI('Salvo na nuvem', 'on');
+    } catch (e) { setUI('Sem internet', 'err'); toast('Salvo apenas no celular', 'err'); }
   }
 
-  // Inicia o loop de sincronização a cada 4 segundos
   function startSync() {
     if (syncTimer) clearInterval(syncTimer);
-    fetchBin(); // Busca imediata
+    fetchBin();
     syncTimer = setInterval(fetchBin, 4000);
   }
 
-  // ==========================================
-  // LOCALSTORAGE
-  // ==========================================
   function saveLocal() { localStorage.setItem('setlist_data', JSON.stringify(data)); }
-  function loadLocal() {
-    try { const d = JSON.parse(localStorage.getItem('setlist_data')); if (d && d.songs) data = d; } catch(e) {}
-  }
+  function loadLocal() { try { const d = JSON.parse(localStorage.getItem('setlist_data')); if (d && d.songs) data = d; } catch(e) {} }
 
-  // ==========================================
-  // UI HELPERS
-  // ==========================================
   function toast(msg, type = 'ok') {
-    const t = document.createElement('div');
-    t.className = `toast ${type}`;
+    const t = document.createElement('div'); t.className = `toast ${type}`;
     t.innerHTML = `<i class="fa-solid ${type === 'err' ? 'fa-circle-xmark' : 'fa-circle-check'}"></i>${msg}`;
-    $('toasts').appendChild(t);
-    setTimeout(() => t.remove(), 2500);
+    $('toasts').appendChild(t); setTimeout(() => t.remove(), 3000);
   }
-
   function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
   function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
-
   function setUI(status, color) {
     $('connStatus').textContent = status;
-    $('connRoom').textContent = binId ? `ID: ${binId}` : 'Clique para configurar';
+    $('connRoom').textContent = binId ? `ID: ${binId}` : 'Aguardando...';
     $('connDot').className = 'conn-dot ' + color;
   }
-
   function updateStats() {
     $('stMus').textContent = data.songs.length;
     $('stCat').textContent = data.cats.length;
     $('stTom').textContent = new Set(data.songs.map(s => s.tom.trim().toLowerCase())).size;
   }
 
-  // ==========================================
-  // RENDERIZAÇÃO
-  // ==========================================
   function renderChips() {
     const el = $('chips'); el.innerHTML = '';
     const all = document.createElement('div');
@@ -391,13 +332,11 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
     all.innerHTML = `Todas <span class="chip-cnt">${data.songs.length}</span>`;
     all.addEventListener('click', () => { activeCat = 'all'; renderSongs(); renderChips(); });
     el.appendChild(all);
-
     data.cats.forEach(c => {
       const ch = document.createElement('div');
       ch.className = `chip${activeCat === c.id ? ' active' : ''}`;
       const cnt = data.songs.filter(s => s.catId === c.id).length;
       ch.innerHTML = `${esc(c.name)} <span class="chip-cnt">${cnt}</span>`;
-      
       let timer = null, isLong = false;
       ch.addEventListener('touchstart', () => { isLong = false; timer = setTimeout(() => { isLong = true; deleteCat(c.id); }, 500); }, { passive: true });
       ch.addEventListener('touchend', (e) => { clearTimeout(timer); if(!isLong){ activeCat = c.id; renderSongs(); renderChips(); } e.preventDefault(); });
@@ -422,54 +361,25 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
     $('listCount').textContent = list.length;
     const catObj = data.cats.find(c => c.id === activeCat);
     $('listTitle').textContent = activeCat === 'all' ? 'Todas as Musicas' : (catObj ? catObj.name : '—');
-
     list.forEach((s, i) => {
-      const card = document.createElement('div');
-      card.className = 'song-card'; card.style.animationDelay = `${i * 0.03}s`;
+      const card = document.createElement('div'); card.className = 'song-card'; card.style.animationDelay = `${i * 0.03}s`;
       const cat = data.cats.find(c => c.id === s.catId);
       const artistH = s.artist ? `<div class="sc-artist">${esc(s.artist)}</div>` : '';
       const obsH = s.obs ? `<div class="sc-obs">${esc(s.obs)}</div>` : '';
       const catH = cat ? `<span class="tag tag-cat">${esc(cat.name)}</span>` : '';
       const ordH = s.order ? `<span class="tag tag-ord">#${s.order}</span>` : '';
-      card.innerHTML = `
-        <div class="sc-top"><div class="sc-info"><div class="sc-name">${esc(s.name)}</div>${artistH}</div></div>
-        <div class="sc-tags"><span class="tag tag-tom">${esc(s.tom)}</span>${catH} ${ordH}</div>
-        ${obsH}
-        <div class="sc-actions"><button class="btn-del" aria-label="Remover"><i class="fa-solid fa-trash-can"></i> Remover</button></div>`;
-      card.querySelector('.btn-del').addEventListener('click', () => {
-        data.songs = data.songs.filter(x => x.id !== s.id);
-        saveLocal(); pushBin(); render();
-        toast('Removida');
-      });
+      card.innerHTML = `<div class="sc-top"><div class="sc-info"><div class="sc-name">${esc(s.name)}</div>${artistH}</div></div><div class="sc-tags"><span class="tag tag-tom">${esc(s.tom)}</span>${catH} ${ordH}</div>${obsH}<div class="sc-actions"><button class="btn-del" aria-label="Remover"><i class="fa-solid fa-trash-can"></i> Remover</button></div>`;
+      card.querySelector('.btn-del').addEventListener('click', () => { data.songs = data.songs.filter(x => x.id !== s.id); saveLocal(); pushBin(); render(); toast('Removida'); });
       el.appendChild(card);
     });
   }
 
-  function getFiltered() {
-    let list = activeCat === 'all' ? [...data.songs] : data.songs.filter(s => s.catId === activeCat);
-    return list.sort((a, b) => (a.order || 999) - (b.order || 999));
-  }
-
+  function getFiltered() { let list = activeCat === 'all' ? [...data.songs] : data.songs.filter(s => s.catId === activeCat); return list.sort((a, b) => (a.order || 999) - (b.order || 999)); }
   function render() { updateStats(); renderChips(); renderSongs(); updateCatSelect(); }
 
-  // ==========================================
-  // AÇÕES DE DADOS (CATEGORIAS E MÚSICAS)
-  // ==========================================
-  function addCat(name) {
-    const c = { id: uid(), name: name.trim() };
-    data.cats.push(c);
-    saveLocal(); pushBin(); render();
-  }
+  function addCat(name) { data.cats.push({ id: uid(), name: name.trim() }); saveLocal(); pushBin(); render(); }
+  function deleteCat(id) { data.cats = data.cats.filter(c => c.id !== id); data.songs = data.songs.filter(s => s.catId !== id); if (activeCat === id) activeCat = "all"; saveLocal(); pushBin(); render(); toast('Categoria removida'); }
 
-  function deleteCat(id) {
-    data.cats = data.cats.filter(c => c.id !== id);
-    data.songs = data.songs.filter(s => s.catId !== id);
-    if (activeCat === id) activeCat = "all";
-    saveLocal(); pushBin(); render();
-    toast('Categoria removida');
-  }
-
-  // --- Modais ---
   function openCat() { $('ovCat').classList.add('open'); $('inCatName').value = ''; setTimeout(() => $('inCatName').focus(), 300); }
   function closeCat() { $('ovCat').classList.remove('open'); }
   $('btnOpenCat').addEventListener('click', openCat);
@@ -487,105 +397,32 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
   function closeSong() { $('ovSong').classList.remove('open'); }
   $('fab').addEventListener('click', openSong);
   $('ovSong').addEventListener('click', e => { if (e.target === $('ovSong')) closeSong(); });
-
   function checkForm() { $('btnSaveSong').disabled = !($('inName').value.trim() && $('inTom').value.trim()); }
-  $('inName').addEventListener('input', checkForm);
-  $('inTom').addEventListener('input', checkForm);
+  $('inName').addEventListener('input', checkForm); $('inTom').addEventListener('input', checkForm);
 
   $('btnSaveSong').addEventListener('click', () => {
-    const name = $('inName').value.trim(), tom = $('inTom').value.trim();
-    if (!name || !tom) return;
-    let catId = $('inCat').value;
-    if (!catId && data.cats.length > 0) catId = data.cats[0].id;
+    const name = $('inName').value.trim(), tom = $('inTom').value.trim(); if (!name || !tom) return;
+    let catId = $('inCat').value; if (!catId && data.cats.length > 0) catId = data.cats[0].id;
     data.songs.push({ id: uid(), name, tom, artist: $('inArtist').value.trim(), obs: $('inObs').value.trim(), catId: catId || '', order: parseInt($('inOrd').value) || 0 });
     $('inName').value = ''; $('inTom').value = ''; $('inArtist').value = ''; $('inObs').value = ''; $('inOrd').value = ''; checkForm();
     saveLocal(); pushBin(); closeSong(); render(); toast('Musica adicionada');
   });
 
-  // ==========================================
-  // MODAL DE SALAS (JSONBIN)
-  // ==========================================
-  $('connBar').addEventListener('click', () => {
-    $('inRoom').value = binId || '';
-    $('ovRoom').classList.add('open');
-    setTimeout(() => { if(!binId) $('inRoom').focus(); else $('btnJoinRoom').focus(); }, 300);
-  });
-  $('ovRoom').addEventListener('click', e => { if (e.target === $('ovRoom')) $('ovRoom').classList.remove('open'); });
-
-  // Entrar em sala existente
-  $('btnJoinRoom').addEventListener('click', async () => {
-    const id = $('inRoom').value.trim();
-    if (!id) { toast('Cole o ID da sala', 'err'); return; }
-    binId = id;
-    localStorage.setItem('setlist_bin', binId);
-    $('ovRoom').classList.remove('open');
-    setUI('Conectando...', 'sync');
-    await fetchBin();
-    if ($('connDot').classList.contains('on')) {
-      toast('Conectado a sala!');
-      render();
-    }
-  });
-
-  // Criar sala nova
-  $('btnNewRoom').addEventListener('click', async () => {
-    $('ovRoom').classList.remove('open');
-    await createBin();
-    render();
-  });
-
-  // ==========================================
-  // PDF
-  // ==========================================
   $('btnPdf').addEventListener('click', () => {
     if (!data.songs.length) { toast('Adicione musicas primeiro', 'err'); return; }
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
-    const pw = doc.internal.pageSize.getWidth(), mg = 15;
-    let y = 15;
-    doc.setFillColor(4, 6, 13); doc.rect(0, 0, pw, 35, 'F');
-    doc.setFillColor(37, 99, 235); doc.rect(0, 35, pw, 1, 'F');
-    doc.setTextColor(96, 165, 250); doc.setFontSize(22); doc.setFont('helvetica', 'bold');
-    doc.text('SETLIST', mg, y); y += 7;
-    doc.setTextColor(148, 163, 184); doc.setFontSize(9); doc.setFont('helvetica', 'normal');
-    doc.text(`Sala: ${binId || 'Local'}  |  ${new Date().toLocaleDateString('pt-BR')}  |  ${data.songs.length} musicas`, mg, y);
-    y = 48;
-
+    const { jsPDF } = window.jspdf; const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+    const pw = doc.internal.pageSize.getWidth(), mg = 15; let y = 15;
+    doc.setFillColor(4, 6, 13); doc.rect(0, 0, pw, 35, 'F'); doc.setFillColor(37, 99, 235); doc.rect(0, 35, pw, 1, 'F');
+    doc.setTextColor(96, 165, 250); doc.setFontSize(22); doc.setFont('helvetica', 'bold'); doc.text('SETLIST', mg, y); y += 7;
+    doc.setTextColor(148, 163, 184); doc.setFontSize(9); doc.setFont('helvetica', 'normal'); doc.text(`Sala: ${binId || 'Local'}  |  ${new Date().toLocaleDateString('pt-BR')}  |  ${data.songs.length} musicas`, mg, y); y = 48;
     const catsToPrint = activeCat === 'all' ? data.cats : data.cats.filter(c => c.id === activeCat);
-    if (!catsToPrint.length) {
-      y = printGroup(doc, data.songs, 'Geral', y, mg, pw);
-    } else {
-      catsToPrint.forEach(cat => {
-        const cs = data.songs.filter(s => s.catId === cat.id).sort((a,b) => (a.order||999) - (b.order||999));
-        if (!cs.length) return;
-        if (y > 260) { doc.addPage(); y = 20; }
-        doc.setFillColor(37, 99, 235); doc.rect(mg, y, pw - mg*2, 7, 'F');
-        doc.setTextColor(255, 255, 255); doc.setFontSize(10); doc.setFont('helvetica', 'bold');
-        doc.text(cat.name.toUpperCase(), mg + 4, y + 5); y += 12;
-        cs.forEach((s, i) => {
-          if (y > 275) { doc.addPage(); y = 20; }
-          if (i % 2 === 0) { doc.setFillColor(10, 17, 40); doc.rect(mg, y - 2, pw - mg*2, 11, 'F'); }
-          doc.setTextColor(226, 232, 240); doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.text(s.name, mg + 4, y + 3);
-          doc.setTextColor(96, 165, 250); const tw = doc.getTextWidth(s.tom); doc.text(s.tom, pw - mg - tw, y + 3);
-          if (s.artist) { doc.setTextColor(71, 85, 105); doc.setFontSize(8); doc.setFont('helvetica', 'normal'); doc.text(s.artist, mg + 4, y + 7.5); y += 14; } else y += 11;
-        }); y += 8;
-      });
-    }
+    if (!catsToPrint.length) { y = printGroup(doc, data.songs, 'Geral', y, mg, pw); } else { catsToPrint.forEach(cat => { const cs = data.songs.filter(s => s.catId === cat.id).sort((a,b) => (a.order||999) - (b.order||999)); if (!cs.length) return; if (y > 260) { doc.addPage(); y = 20; } doc.setFillColor(37, 99, 235); doc.rect(mg, y, pw - mg*2, 7, 'F'); doc.setTextColor(255, 255, 255); doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.text(cat.name.toUpperCase(), mg + 4, y + 5); y += 12; cs.forEach((s, i) => { if (y > 275) { doc.addPage(); y = 20; } if (i % 2 === 0) { doc.setFillColor(10, 17, 40); doc.rect(mg, y - 2, pw - mg*2, 11, 'F'); } doc.setTextColor(226, 232, 240); doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.text(s.name, mg + 4, y + 3); doc.setTextColor(96, 165, 250); const tw = doc.getTextWidth(s.tom); doc.text(s.tom, pw - mg - tw, y + 3); if (s.artist) { doc.setTextColor(71, 85, 105); doc.setFontSize(8); doc.setFont('helvetica', 'normal'); doc.text(s.artist, mg + 4, y + 7.5); y += 14; } else y += 11; }); y += 8; }); }
     for (let i = 1; i <= doc.internal.getNumberOfPages(); i++) { doc.setPage(i); doc.setTextColor(71, 85, 105); doc.setFontSize(8); doc.text(`${i}/${doc.internal.getNumberOfPages()}`, pw/2, 290, {align:'center'}); }
-    doc.save(`SetList_${binId || 'local'}.pdf`); toast('PDF baixado');
+    doc.save(`SetList.pdf`); toast('PDF baixado');
   });
-
   function printGroup(doc, list, title, y, mg, pw) {
-    if (y > 260) { doc.addPage(); y = 20; }
-    doc.setFillColor(37, 99, 235); doc.rect(mg, y, pw - mg*2, 7, 'F');
-    doc.setTextColor(255, 255, 255); doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.text(title.toUpperCase(), mg + 4, y + 5); y += 12;
-    list.sort((a,b) => (a.order||999) - (b.order||999)).forEach((s, i) => {
-      if (y > 275) { doc.addPage(); y = 20; }
-      if (i % 2 === 0) { doc.setFillColor(10, 17, 40); doc.rect(mg, y - 2, pw - mg*2, 11, 'F'); }
-      doc.setTextColor(226, 232, 240); doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.text(s.name, mg + 4, y + 3);
-      doc.setTextColor(96, 165, 250); const tw = doc.getTextWidth(s.tom); doc.text(s.tom, pw - mg - tw, y + 3);
-      if (s.artist) { doc.setTextColor(71, 85, 105); doc.setFontSize(8); doc.setFont('helvetica', 'normal'); doc.text(s.artist, mg + 4, y + 7.5); y += 14; } else y += 11;
-    }); return y + 8;
+    if (y > 260) { doc.addPage(); y = 20; } doc.setFillColor(37, 99, 235); doc.rect(mg, y, pw - mg*2, 7, 'F'); doc.setTextColor(255, 255, 255); doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.text(title.toUpperCase(), mg + 4, y + 5); y += 12;
+    list.sort((a,b) => (a.order||999) - (b.order||999)).forEach((s, i) => { if (y > 275) { doc.addPage(); y = 20; } if (i % 2 === 0) { doc.setFillColor(10, 17, 40); doc.rect(mg, y - 2, pw - mg*2, 11, 'F'); } doc.setTextColor(226, 232, 240); doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.text(s.name, mg + 4, y + 3); doc.setTextColor(96, 165, 250); const tw = doc.getTextWidth(s.tom); doc.text(s.tom, pw - mg - tw, y + 3); if (s.artist) { doc.setTextColor(71, 85, 105); doc.setFontSize(8); doc.setFont('helvetica', 'normal'); doc.text(s.artist, mg + 4, y + 7.5); y += 14; } else y += 11; }); return y + 8;
   }
 
   // ==========================================
@@ -594,11 +431,11 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
   loadLocal();
   render();
 
-  if (binId) {
+  if (GLOBAL_BIN_ID !== 'COLE_AQUI_O_ID_DO_SEU_BIN') {
+    binId = GLOBAL_BIN_ID;
     startSync();
   } else {
-    // Se é a primeira vez abrindo, cria uma sala automaticamente
-    createBin();
+    createBin(); // Cria automaticamente na primeira vez para te dar o ID
   }
 
 })();
