@@ -55,7 +55,7 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 @keyframes spin { to { transform: rotate(360deg); } }
 .conn-info { display: flex; flex-direction: column; min-width: 0; }
 .conn-status { font-size: 11px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
-.conn-room { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent-metal); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.conn-room { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent-metal); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; padding: 2px 0; }
 
 .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 24px; }
 .stat-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 14px 10px; text-align: center; position: relative; overflow: hidden; }
@@ -121,7 +121,7 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 .btn-sec { background: var(--surface-2); color: var(--text-dim); border: 1px solid var(--border); margin-top: 10px; }
 
 .toast-box { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); z-index: 300; width: calc(100% - 32px); max-width: 400px; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
-.toast { background: var(--surface-2); border: 1px solid var(--border-light); border-radius: var(--r-xs); padding: 12px 16px; font-size: 13px; font-weight: 600; color: #fff; display: flex; align-items: center; gap: 10px; pointer-events: all; box-shadow: 0 8px 20px rgba(0,0,0,0.5); animation: tIn 0.3s ease, tOut 0.3s ease 2s forwards; }
+.toast { background: var(--surface-2); border: 1px solid var(--border-light); border-radius: var(--r-xs); padding: 12px 16px; font-size: 13px; font-weight: 600; color: #fff; display: flex; align-items: center; gap: 10px; pointer-events: all; box-shadow: 0 8px 20px rgba(0,0,0,0.5); animation: tIn 0.3s ease, tOut 0.3s ease 2.5s forwards; }
 .toast i { font-size: 16px; }
 .toast.ok i { color: var(--success); }
 .toast.err i { color: var(--danger); }
@@ -192,7 +192,7 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
       <div class="conn-dot sync" id="connDot"></div>
       <div class="conn-info">
         <div class="conn-status" id="connStatus">Conectando...</div>
-        <div class="conn-room" id="connRoom">---</div>
+        <div class="conn-room" id="connRoom" title="Toque para copiar">---</div>
       </div>
     </div>
   </div>
@@ -227,75 +227,62 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 (function() {
   "use strict";
 
-  // =======================================================================
-  // 🔴 CONFIGURAÇÃO DA SALA
-  // 1. Abra o app assim (vazio). Ele vai criar uma sala e mostrar o ID.
-  // 2. Copie o ID que apareceu no toast.
-  // 3. Substitua o texto 'COLE_AQUI_O_ID_DO_SEU_BIN' pelo ID copiado.
-  // 4. Mande este arquivo para a banda. Todos conectarão direto aqui!
-  // =======================================================================
-  const GLOBAL_BIN_ID = '6a729248da38895dfebacd88'; 
-  // =======================================================================
+  // ID fixo da sala — ja esta pronto, so abrir e usar
+  var BIN_ID = '6a729248da38895dfebacd88';
 
-  const API_KEY = '$2a$10$oxPjSemP6.ZbivpbS4Ycp.GEfwwE5bV3K7ddo522WVY38ic838lr.';
-  const API_URL = 'https://api.jsonbin.io/v3';
-  const HEADERS = { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY };
+  var API_KEY = '$2a$10$oxPjSemP6.ZbivpbS4Ycp.GEfwwE5bV3K7ddo522WVY38ic838lr.';
+  var API_URL = 'https://api.jsonbin.io/v3';
+  var HEADERS = { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY };
 
-  let data = { cats: [], songs: [], ts: 0 };
-  let activeCat = "all";
-  let binId = null;
-  let syncTimer = null;
-  let isSyncing = false;
+  var data = { cats: [], songs: [], ts: 0 };
+  var activeCat = "all";
+  var syncTimer = null;
+  var isSyncing = false;
 
-  const $ = id => document.getElementById(id);
+  var $ = function(id) { return document.getElementById(id); };
 
-  async function createBin() {
-    setUI('Criando sala...', 'sync');
-    try {
-      const res = await fetch(`${API_URL}/b`, {
-        method: 'POST', headers: HEADERS,
-        body: JSON.stringify({ cats: [], songs: [], ts: Date.now() })
-      });
-      const json = await res.json();
-      binId = json.metadata.id;
-      setUI('Sincronizado', 'on');
-      toast('Sala criada! ID: ' + binId);
-      startSync();
-    } catch (e) {
-      setUI('Sem internet', 'err');
-      toast('Erro ao criar sala', 'err');
-    }
+  // ---------- Copiar ID ----------
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function() { toast('ID copiado!'); }).catch(function() { fbCopy(text); });
+    } else { fbCopy(text); }
+  }
+  function fbCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); toast('ID copiado!'); } catch(e) { toast('Erro ao copiar', 'err'); }
+    document.body.removeChild(ta);
   }
 
-  async function fetchBin() {
-    if (!binId || isSyncing) return;
+  // ---------- JSONBin ----------
+  function fetchBin() {
+    if (isSyncing) return;
     isSyncing = true;
-    try {
-      const res = await fetch(`${API_URL}/b/${binId}/latest`, { headers: HEADERS });
-      if (!res.ok) throw new Error();
-      const json = await res.json();
-      const remote = json.record;
-      if (remote.ts > data.ts) {
-        data.cats = remote.cats || [];
-        data.songs = remote.songs || [];
-        data.ts = remote.ts;
-        saveLocal(); render();
-      }
-      setUI('Sincronizado', 'on');
-    } catch (e) { setUI('Offline', 'err'); }
-    isSyncing = false;
+    fetch(API_URL + '/b/' + BIN_ID + '/latest', { headers: HEADERS })
+      .then(function(r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function(json) {
+        var remote = json.record;
+        if (remote.ts > data.ts) {
+          data.cats = remote.cats || [];
+          data.songs = remote.songs || [];
+          data.ts = remote.ts;
+          saveLocal(); render();
+        }
+        setUI('Sincronizado', 'on');
+      })
+      .catch(function() { setUI('Offline', 'err'); })
+      .finally(function() { isSyncing = false; });
   }
 
-  async function pushBin() {
-    if (!binId) return;
+  function pushBin() {
     data.ts = Date.now();
-    try {
-      await fetch(`${API_URL}/b/${binId}`, {
-        method: 'PUT', headers: HEADERS,
-        body: JSON.stringify({ cats: data.cats, songs: data.songs, ts: data.ts })
-      });
-      saveLocal(); setUI('Salvo na nuvem', 'on');
-    } catch (e) { setUI('Sem internet', 'err'); toast('Salvo apenas no celular', 'err'); }
+    fetch(API_URL + '/b/' + BIN_ID, {
+      method: 'PUT', headers: HEADERS,
+      body: JSON.stringify({ cats: data.cats, songs: data.songs, ts: data.ts })
+    })
+      .then(function(r) { if (!r.ok) throw new Error(r.status); saveLocal(); setUI('Salvo na nuvem', 'on'); })
+      .catch(function() { setUI('Sem internet', 'err'); toast('Salvo apenas no celular', 'err'); });
   }
 
   function startSync() {
@@ -304,139 +291,159 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
     syncTimer = setInterval(fetchBin, 4000);
   }
 
+  // ---------- Local ----------
   function saveLocal() { localStorage.setItem('setlist_data', JSON.stringify(data)); }
-  function loadLocal() { try { const d = JSON.parse(localStorage.getItem('setlist_data')); if (d && d.songs) data = d; } catch(e) {} }
+  function loadLocal() { try { var d = JSON.parse(localStorage.getItem('setlist_data')); if (d && Array.isArray(d.songs)) data = d; } catch(e) {} }
 
-  function toast(msg, type = 'ok') {
-    const t = document.createElement('div'); t.className = `toast ${type}`;
-    t.innerHTML = `<i class="fa-solid ${type === 'err' ? 'fa-circle-xmark' : 'fa-circle-check'}"></i>${msg}`;
-    $('toasts').appendChild(t); setTimeout(() => t.remove(), 3000);
+  // ---------- UI ----------
+  function toast(msg, type) {
+    type = type || 'ok';
+    var t = document.createElement('div');
+    t.className = 'toast ' + type;
+    t.innerHTML = '<i class="fa-solid ' + (type === 'err' ? 'fa-circle-xmark' : 'fa-circle-check') + '"></i>' + esc(msg);
+    $('toasts').appendChild(t);
+    setTimeout(function() { if (t.parentNode) t.remove(); }, 3200);
   }
   function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
-  function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+  function esc(s) { var d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
   function setUI(status, color) {
     $('connStatus').textContent = status;
-    $('connRoom').textContent = binId ? `ID: ${binId}` : 'Aguardando...';
+    $('connRoom').textContent = 'ID: ' + BIN_ID;
     $('connDot').className = 'conn-dot ' + color;
   }
+
+  $('connRoom').addEventListener('click', function() { copyText(BIN_ID); });
+
   function updateStats() {
     $('stMus').textContent = data.songs.length;
     $('stCat').textContent = data.cats.length;
-    $('stTom').textContent = new Set(data.songs.map(s => s.tom.trim().toLowerCase())).size;
+    var tons = {};
+    data.songs.forEach(function(s) { if (s.tom) tons[s.tom.trim().toLowerCase()] = 1; });
+    $('stTom').textContent = Object.keys(tons).length;
   }
 
+  // ---------- Chips ----------
   function renderChips() {
-    const el = $('chips'); el.innerHTML = '';
-    const all = document.createElement('div');
-    all.className = `chip${activeCat === 'all' ? ' active' : ''}`;
-    all.innerHTML = `Todas <span class="chip-cnt">${data.songs.length}</span>`;
-    all.addEventListener('click', () => { activeCat = 'all'; renderSongs(); renderChips(); });
+    var el = $('chips'); el.innerHTML = '';
+    var all = document.createElement('div');
+    all.className = 'chip' + (activeCat === 'all' ? ' active' : '');
+    all.innerHTML = 'Todas <span class="chip-cnt">' + data.songs.length + '</span>';
+    all.addEventListener('click', function() { activeCat = 'all'; renderSongs(); renderChips(); });
     el.appendChild(all);
-    data.cats.forEach(c => {
-      const ch = document.createElement('div');
-      ch.className = `chip${activeCat === c.id ? ' active' : ''}`;
-      const cnt = data.songs.filter(s => s.catId === c.id).length;
-      ch.innerHTML = `${esc(c.name)} <span class="chip-cnt">${cnt}</span>`;
-      let timer = null, isLong = false;
-      ch.addEventListener('touchstart', () => { isLong = false; timer = setTimeout(() => { isLong = true; deleteCat(c.id); }, 500); }, { passive: true });
-      ch.addEventListener('touchend', (e) => { clearTimeout(timer); if(!isLong){ activeCat = c.id; renderSongs(); renderChips(); } e.preventDefault(); });
-      ch.addEventListener('touchmove', () => clearTimeout(timer), { passive: true });
-      ch.addEventListener('contextmenu', (e) => { e.preventDefault(); deleteCat(c.id); });
-      ch.addEventListener('click', () => { if(!('ontouchstart' in window)){ activeCat = c.id; renderSongs(); renderChips(); } });
+    data.cats.forEach(function(c) {
+      var ch = document.createElement('div');
+      ch.className = 'chip' + (activeCat === c.id ? ' active' : '');
+      var cnt = data.songs.filter(function(s) { return s.catId === c.id; }).length;
+      ch.innerHTML = esc(c.name) + ' <span class="chip-cnt">' + cnt + '</span>';
+      var timer = null, isLong = false;
+      ch.addEventListener('touchstart', function() { isLong = false; timer = setTimeout(function() { isLong = true; deleteCat(c.id); }, 500); }, { passive: true });
+      ch.addEventListener('touchend', function(e) { clearTimeout(timer); if (!isLong) { activeCat = c.id; renderSongs(); renderChips(); } e.preventDefault(); });
+      ch.addEventListener('touchmove', function() { clearTimeout(timer); }, { passive: true });
+      ch.addEventListener('contextmenu', function(e) { e.preventDefault(); deleteCat(c.id); });
+      ch.addEventListener('click', function() { if (!('ontouchstart' in window)) { activeCat = c.id; renderSongs(); renderChips(); } });
       el.appendChild(ch);
     });
-    setTimeout(() => { const a = el.querySelector('.active'); if(a) a.scrollIntoView({behavior:'smooth', inline:'center'}); }, 50);
+    setTimeout(function() { var a = el.querySelector('.active'); if (a) a.scrollIntoView({ behavior: 'smooth', inline: 'center' }); }, 50);
   }
 
   function updateCatSelect() {
-    const sel = $('inCat'), val = sel.value;
+    var sel = $('inCat'), val = sel.value;
     sel.innerHTML = '<option value="">Selecione...</option>';
-    data.cats.forEach(c => { const o = document.createElement('option'); o.value = c.id; o.textContent = c.name; sel.appendChild(o); });
-    if (data.cats.find(c => c.id === val)) sel.value = val;
+    data.cats.forEach(function(c) { var o = document.createElement('option'); o.value = c.id; o.textContent = c.name; sel.appendChild(o); });
+    if (data.cats.find(function(c) { return c.id === val; })) sel.value = val;
   }
 
+  // ---------- Musicas ----------
   function renderSongs() {
-    const list = getFiltered(), el = $('songList'); el.innerHTML = '';
+    var list = getFiltered(), el = $('songList'); el.innerHTML = '';
     $('emptyMsg').classList.toggle('hidden', list.length > 0);
     $('listCount').textContent = list.length;
-    const catObj = data.cats.find(c => c.id === activeCat);
+    var catObj = data.cats.find(function(c) { return c.id === activeCat; });
     $('listTitle').textContent = activeCat === 'all' ? 'Todas as Musicas' : (catObj ? catObj.name : '—');
-    list.forEach((s, i) => {
-      const card = document.createElement('div'); card.className = 'song-card'; card.style.animationDelay = `${i * 0.03}s`;
-      const cat = data.cats.find(c => c.id === s.catId);
-      const artistH = s.artist ? `<div class="sc-artist">${esc(s.artist)}</div>` : '';
-      const obsH = s.obs ? `<div class="sc-obs">${esc(s.obs)}</div>` : '';
-      const catH = cat ? `<span class="tag tag-cat">${esc(cat.name)}</span>` : '';
-      const ordH = s.order ? `<span class="tag tag-ord">#${s.order}</span>` : '';
-      card.innerHTML = `<div class="sc-top"><div class="sc-info"><div class="sc-name">${esc(s.name)}</div>${artistH}</div></div><div class="sc-tags"><span class="tag tag-tom">${esc(s.tom)}</span>${catH} ${ordH}</div>${obsH}<div class="sc-actions"><button class="btn-del" aria-label="Remover"><i class="fa-solid fa-trash-can"></i> Remover</button></div>`;
-      card.querySelector('.btn-del').addEventListener('click', () => { data.songs = data.songs.filter(x => x.id !== s.id); saveLocal(); pushBin(); render(); toast('Removida'); });
+    list.forEach(function(s, i) {
+      var card = document.createElement('div'); card.className = 'song-card'; card.style.animationDelay = (i * 0.03) + 's';
+      var cat = data.cats.find(function(c) { return c.id === s.catId; });
+      var artistH = s.artist ? '<div class="sc-artist">' + esc(s.artist) + '</div>' : '';
+      var obsH = s.obs ? '<div class="sc-obs">' + esc(s.obs) + '</div>' : '';
+      var catH = cat ? '<span class="tag tag-cat">' + esc(cat.name) + '</span>' : '';
+      var ordH = s.order ? '<span class="tag tag-ord">#' + esc(String(s.order)) + '</span>' : '';
+      card.innerHTML = '<div class="sc-top"><div class="sc-info"><div class="sc-name">' + esc(s.name) + '</div>' + artistH + '</div></div><div class="sc-tags"><span class="tag tag-tom">' + esc(s.tom) + '</span>' + catH + ' ' + ordH + '</div>' + obsH + '<div class="sc-actions"><button class="btn-del" aria-label="Remover"><i class="fa-solid fa-trash-can"></i> Remover</button></div>';
+      card.querySelector('.btn-del').addEventListener('click', function() { data.songs = data.songs.filter(function(x) { return x.id !== s.id; }); saveLocal(); pushBin(); render(); toast('Removida'); });
       el.appendChild(card);
     });
   }
 
-  function getFiltered() { let list = activeCat === 'all' ? [...data.songs] : data.songs.filter(s => s.catId === activeCat); return list.sort((a, b) => (a.order || 999) - (b.order || 999)); }
+  function getFiltered() {
+    var list = activeCat === 'all' ? data.songs.slice() : data.songs.filter(function(s) { return s.catId === activeCat; });
+    return list.sort(function(a, b) { return (a.order || 999) - (b.order || 999); });
+  }
+
   function render() { updateStats(); renderChips(); renderSongs(); updateCatSelect(); }
 
+  // ---------- CRUD Categoria ----------
   function addCat(name) { data.cats.push({ id: uid(), name: name.trim() }); saveLocal(); pushBin(); render(); }
-  function deleteCat(id) { data.cats = data.cats.filter(c => c.id !== id); data.songs = data.songs.filter(s => s.catId !== id); if (activeCat === id) activeCat = "all"; saveLocal(); pushBin(); render(); toast('Categoria removida'); }
+  function deleteCat(id) { data.cats = data.cats.filter(function(c) { return c.id !== id; }); data.songs = data.songs.filter(function(s) { return s.catId !== id; }); if (activeCat === id) activeCat = 'all'; saveLocal(); pushBin(); render(); toast('Categoria removida'); }
 
-  function openCat() { $('ovCat').classList.add('open'); $('inCatName').value = ''; setTimeout(() => $('inCatName').focus(), 300); }
+  function openCat() { $('ovCat').classList.add('open'); $('inCatName').value = ''; setTimeout(function() { $('inCatName').focus(); }, 300); }
   function closeCat() { $('ovCat').classList.remove('open'); }
   $('btnOpenCat').addEventListener('click', openCat);
   $('btnCancelCat').addEventListener('click', closeCat);
-  $('ovCat').addEventListener('click', e => { if (e.target === $('ovCat')) closeCat(); });
-  $('inCatName').addEventListener('keydown', e => { if (e.key === 'Enter') $('btnSaveCat').click(); });
-  $('btnSaveCat').addEventListener('click', () => {
-    const n = $('inCatName').value.trim();
+  $('ovCat').addEventListener('click', function(e) { if (e.target === $('ovCat')) closeCat(); });
+  $('inCatName').addEventListener('keydown', function(e) { if (e.key === 'Enter') $('btnSaveCat').click(); });
+  $('btnSaveCat').addEventListener('click', function() {
+    var n = $('inCatName').value.trim();
     if (!n) { toast('Digite um nome', 'err'); return; }
-    if (data.cats.find(c => c.name.toLowerCase() === n.toLowerCase())) { toast('Ja existe', 'err'); return; }
+    if (data.cats.find(function(c) { return c.name.toLowerCase() === n.toLowerCase(); })) { toast('Ja existe', 'err'); return; }
     addCat(n); closeCat(); toast('Categoria criada');
   });
 
-  function openSong() { if (data.cats.length === 0) addCat('Geral'); updateCatSelect(); $('ovSong').classList.add('open'); setTimeout(() => $('inName').focus(), 300); }
-  function closeSong() { $('ovSong').classList.remove('open'); }
+  // ---------- Musica ----------
+  function openSong() { if (data.cats.length === 0) addCat('Geral'); updateCatSelect(); $('ovSong').classList.add('open'); setTimeout(function() { $('inName').focus(); }, 300); }
+  function closeSong() { $('ovSong').classList.remove('open'); $('inName').value = ''; $('inTom').value = ''; $('inArtist').value = ''; $('inObs').value = ''; $('inOrd').value = ''; $('inCat').value = ''; checkForm(); }
   $('fab').addEventListener('click', openSong);
-  $('ovSong').addEventListener('click', e => { if (e.target === $('ovSong')) closeSong(); });
+  $('ovSong').addEventListener('click', function(e) { if (e.target === $('ovSong')) closeSong(); });
   function checkForm() { $('btnSaveSong').disabled = !($('inName').value.trim() && $('inTom').value.trim()); }
-  $('inName').addEventListener('input', checkForm); $('inTom').addEventListener('input', checkForm);
-
-  $('btnSaveSong').addEventListener('click', () => {
-    const name = $('inName').value.trim(), tom = $('inTom').value.trim(); if (!name || !tom) return;
-    let catId = $('inCat').value; if (!catId && data.cats.length > 0) catId = data.cats[0].id;
-    data.songs.push({ id: uid(), name, tom, artist: $('inArtist').value.trim(), obs: $('inObs').value.trim(), catId: catId || '', order: parseInt($('inOrd').value) || 0 });
-    $('inName').value = ''; $('inTom').value = ''; $('inArtist').value = ''; $('inObs').value = ''; $('inOrd').value = ''; checkForm();
+  $('inName').addEventListener('input', checkForm);
+  $('inTom').addEventListener('input', checkForm);
+  $('btnSaveSong').addEventListener('click', function() {
+    var name = $('inName').value.trim(), tom = $('inTom').value.trim();
+    if (!name || !tom) return;
+    var catId = $('inCat').value;
+    if (!catId && data.cats.length > 0) catId = data.cats[0].id;
+    data.songs.push({ id: uid(), name: name, tom: tom, artist: $('inArtist').value.trim(), obs: $('inObs').value.trim(), catId: catId || '', order: parseInt($('inOrd').value) || 0 });
     saveLocal(); pushBin(); closeSong(); render(); toast('Musica adicionada');
   });
 
-  $('btnPdf').addEventListener('click', () => {
+  // ---------- PDF ----------
+  $('btnPdf').addEventListener('click', function() {
     if (!data.songs.length) { toast('Adicione musicas primeiro', 'err'); return; }
-    const { jsPDF } = window.jspdf; const doc = new jsPDF({ unit: 'mm', format: 'a4' });
-    const pw = doc.internal.pageSize.getWidth(), mg = 15; let y = 15;
-    doc.setFillColor(4, 6, 13); doc.rect(0, 0, pw, 35, 'F'); doc.setFillColor(37, 99, 235); doc.rect(0, 35, pw, 1, 'F');
-    doc.setTextColor(96, 165, 250); doc.setFontSize(22); doc.setFont('helvetica', 'bold'); doc.text('SETLIST', mg, y); y += 7;
-    doc.setTextColor(148, 163, 184); doc.setFontSize(9); doc.setFont('helvetica', 'normal'); doc.text(`Sala: ${binId || 'Local'}  |  ${new Date().toLocaleDateString('pt-BR')}  |  ${data.songs.length} musicas`, mg, y); y = 48;
-    const catsToPrint = activeCat === 'all' ? data.cats : data.cats.filter(c => c.id === activeCat);
-    if (!catsToPrint.length) { y = printGroup(doc, data.songs, 'Geral', y, mg, pw); } else { catsToPrint.forEach(cat => { const cs = data.songs.filter(s => s.catId === cat.id).sort((a,b) => (a.order||999) - (b.order||999)); if (!cs.length) return; if (y > 260) { doc.addPage(); y = 20; } doc.setFillColor(37, 99, 235); doc.rect(mg, y, pw - mg*2, 7, 'F'); doc.setTextColor(255, 255, 255); doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.text(cat.name.toUpperCase(), mg + 4, y + 5); y += 12; cs.forEach((s, i) => { if (y > 275) { doc.addPage(); y = 20; } if (i % 2 === 0) { doc.setFillColor(10, 17, 40); doc.rect(mg, y - 2, pw - mg*2, 11, 'F'); } doc.setTextColor(226, 232, 240); doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.text(s.name, mg + 4, y + 3); doc.setTextColor(96, 165, 250); const tw = doc.getTextWidth(s.tom); doc.text(s.tom, pw - mg - tw, y + 3); if (s.artist) { doc.setTextColor(71, 85, 105); doc.setFontSize(8); doc.setFont('helvetica', 'normal'); doc.text(s.artist, mg + 4, y + 7.5); y += 14; } else y += 11; }); y += 8; }); }
-    for (let i = 1; i <= doc.internal.getNumberOfPages(); i++) { doc.setPage(i); doc.setTextColor(71, 85, 105); doc.setFontSize(8); doc.text(`${i}/${doc.internal.getNumberOfPages()}`, pw/2, 290, {align:'center'}); }
-    doc.save(`SetList.pdf`); toast('PDF baixado');
+    var jsPDF = window.jspdf.jsPDF;
+    var doc = new jsPDF({ unit: 'mm', format: 'a4' });
+    var pw = doc.internal.pageSize.getWidth(), mg = 15, y = 15;
+    doc.setFillColor(4, 6, 13); doc.rect(0, 0, pw, 35, 'F');
+    doc.setFillColor(37, 99, 235); doc.rect(0, 35, pw, 1, 'F');
+    doc.setTextColor(96, 165, 250); doc.setFontSize(22); doc.setFont('helvetica', 'bold'); doc.text('SETLIST', mg, y);
+    y += 7;
+    doc.setTextColor(148, 163, 184); doc.setFontSize(9); doc.setFont('helvetica', 'normal');
+    doc.text('Sala: ' + BIN_ID + '  |  ' + new Date().toLocaleDateString('pt-BR') + '  |  ' + data.songs.length + ' musicas', mg, y);
+    y = 48;
+    var catsToPrint = activeCat === 'all' ? data.cats : data.cats.filter(function(c) { return c.id === activeCat; });
+    if (!catsToPrint.length) { y = printGroup(doc, data.songs, 'Geral', y, mg, pw); }
+    else { catsToPrint.forEach(function(cat) { var cs = data.songs.filter(function(s) { return s.catId === cat.id; }).sort(function(a,b) { return (a.order||999)-(b.order||999); }); if (!cs.length) return; if (y > 260) { doc.addPage(); y = 20; } doc.setFillColor(37,99,235); doc.rect(mg, y, pw-mg*2, 7, 'F'); doc.setTextColor(255,255,255); doc.setFontSize(10); doc.setFont('helvetica','bold'); doc.text(cat.name.toUpperCase(), mg+4, y+5); y += 12; cs.forEach(function(s,i) { if (y>275) { doc.addPage(); y=20; } if (i%2===0) { doc.setFillColor(10,17,40); doc.rect(mg, y-2, pw-mg*2, 11, 'F'); } doc.setTextColor(226,232,240); doc.setFontSize(10); doc.setFont('helvetica','bold'); doc.text(s.name, mg+4, y+3); doc.setTextColor(96,165,250); var tw=doc.getTextWidth(s.tom); doc.text(s.tom, pw-mg-tw, y+3); if (s.artist) { doc.setTextColor(71,85,105); doc.setFontSize(8); doc.setFont('helvetica','normal'); doc.text(s.artist, mg+4, y+7.5); y+=14; } else y+=11; }); y+=8; }); }
+    for (var i = 1; i <= doc.internal.getNumberOfPages(); i++) { doc.setPage(i); doc.setTextColor(71,85,105); doc.setFontSize(8); doc.text(i+'/'+doc.internal.getNumberOfPages(), pw/2, 290, {align:'center'}); }
+    doc.save('SetList.pdf'); toast('PDF baixado');
   });
   function printGroup(doc, list, title, y, mg, pw) {
-    if (y > 260) { doc.addPage(); y = 20; } doc.setFillColor(37, 99, 235); doc.rect(mg, y, pw - mg*2, 7, 'F'); doc.setTextColor(255, 255, 255); doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.text(title.toUpperCase(), mg + 4, y + 5); y += 12;
-    list.sort((a,b) => (a.order||999) - (b.order||999)).forEach((s, i) => { if (y > 275) { doc.addPage(); y = 20; } if (i % 2 === 0) { doc.setFillColor(10, 17, 40); doc.rect(mg, y - 2, pw - mg*2, 11, 'F'); } doc.setTextColor(226, 232, 240); doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.text(s.name, mg + 4, y + 3); doc.setTextColor(96, 165, 250); const tw = doc.getTextWidth(s.tom); doc.text(s.tom, pw - mg - tw, y + 3); if (s.artist) { doc.setTextColor(71, 85, 105); doc.setFontSize(8); doc.setFont('helvetica', 'normal'); doc.text(s.artist, mg + 4, y + 7.5); y += 14; } else y += 11; }); return y + 8;
+    if (y>260) { doc.addPage(); y=20; } doc.setFillColor(37,99,235); doc.rect(mg,y,pw-mg*2,7,'F'); doc.setTextColor(255,255,255); doc.setFontSize(10); doc.setFont('helvetica','bold'); doc.text(title.toUpperCase(), mg+4, y+5); y+=12;
+    list.sort(function(a,b) { return (a.order||999)-(b.order||999); }).forEach(function(s,i) { if (y>275) { doc.addPage(); y=20; } if (i%2===0) { doc.setFillColor(10,17,40); doc.rect(mg,y-2,pw-mg*2,11,'F'); } doc.setTextColor(226,232,240); doc.setFontSize(10); doc.setFont('helvetica','bold'); doc.text(s.name, mg+4, y+3); doc.setTextColor(96,165,250); var tw=doc.getTextWidth(s.tom); doc.text(s.tom, pw-mg-tw, y+3); if (s.artist) { doc.setTextColor(71,85,105); doc.setFontSize(8); doc.setFont('helvetica','normal'); doc.text(s.artist, mg+4, y+7.5); y+=14; } else y+=11; }); return y+8;
   }
 
   // ==========================================
-  // INICIALIZAÇÃO
+  // INICIO — conecta direto, sem nenhum passo
   // ==========================================
   loadLocal();
   render();
-
-  if (GLOBAL_BIN_ID !== '6a729248da38895dfebacd88') {
-    binId = GLOBAL_BIN_ID;
-    startSync();
-  } else {
-    createBin(); // Cria automaticamente na primeira vez para te dar o ID
-  }
+  startSync();
 
 })();
 </script>
