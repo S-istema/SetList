@@ -3,156 +3,154 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>SetList</title>
-<meta name="theme-color" content="#04060d">
+<title>SetList Renovação</title>
+<meta name="theme-color" content="#1a1004">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 <style>
 :root {
-  --bg-deep: #03050a; --bg: #04060d; --surface: #0a1128; --surface-2: #101d3a; --surface-3: #162044;
-  --border: #1a2e52; --border-light: #243b64; --text: #e2e8f0; --text-dim: #94a3b8; --text-muted: #475569;
-  --accent: #2563eb; --accent-light: #3b82f6; --accent-glow: rgba(37, 99, 235, 0.2); --accent-metal: #60a5fa;
-  --gold: #f59e0b; --gold-glow: rgba(245, 158, 11, 0.22);
+  --bg-deep: #120c08; --bg: #1a1004; --surface: #221a10; --surface-2: #2c2114; --surface-3: #38291a;
+  --border: #4a3826; --border-light: #5e4830; --text: #fef3c7; --text-dim: #d6b88a; --text-muted: #8a7250;
+  --accent: #ea580c; --accent-light: #f97316; --accent-glow: rgba(249, 115, 22, 0.25); --accent-metal: #fb923c;
+  --gold: #facc15; --gold-glow: rgba(250, 204, 21, 0.25);
   --danger: #ef4444; --success: #22c55e; --r: 14px; --r-sm: 10px; --r-xs: 8px;
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { background: var(--bg-deep); color: var(--text); font-family: 'Inter', system-ui, sans-serif; min-height: 100dvh; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
-::-webkit-scrollbar { width: 3px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { background: var(--bg-deep); color: var(--text); font-family: 'Inter', system-ui, sans-serif; min-height: 100dvh; overflow-x: hidden; }
+::-webkit-scrollbar { width: 0px; height: 0px; }
 ::selection { background: var(--accent-light); color: #fff; }
 input, textarea, button, select { font-family: inherit; font-size: inherit; outline: none; }
 input, textarea, select { background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: var(--r-xs); padding: 12px 14px; width: 100%; transition: border-color 0.2s, box-shadow 0.2s; }
 input:focus, textarea:focus, select:focus { border-color: var(--accent-light); box-shadow: 0 0 0 3px var(--accent-glow); }
 input::placeholder, textarea::placeholder { color: var(--text-muted); }
-select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; cursor: pointer; }
+select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a7250' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; cursor: pointer; }
 
 .bg-effects { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
-.bg-orb { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.3; }
-.bg-orb-1 { width: 350px; height: 350px; top: -100px; left: -100px; background: var(--accent); animation: f1 20s ease-in-out infinite alternate; }
-.bg-orb-2 { width: 250px; height: 250px; bottom: 0; right: -50px; background: #1e40af; animation: f2 25s ease-in-out infinite alternate; }
-@keyframes f1 { to { transform: translate(50px, 50px) scale(1.2); } }
-@keyframes f2 { to { transform: translate(-60px, -40px) scale(0.9); } }
+.bg-orb { position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.4; }
+.bg-orb-1 { width: 400px; height: 400px; top: -100px; left: -100px; background: var(--accent); animation: f1 20s ease-in-out infinite alternate; }
+.bg-orb-2 { width: 300px; height: 300px; bottom: 0; right: -50px; background: #b45309; animation: f2 25s ease-in-out infinite alternate; }
+@keyframes f1 { to { transform: translate(80px, 80px) scale(1.3); } }
+@keyframes f2 { to { transform: translate(-80px, -60px) scale(0.8); } }
 
 .app { position: relative; z-index: 1; max-width: 480px; margin: 0 auto; padding: 0 16px 140px; min-height: 100dvh; }
 
-.header { padding: 16px 0 12px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; background: linear-gradient(to bottom, var(--bg-deep) 60%, transparent); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+.header { padding: 20px 0 14px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; background: linear-gradient(to bottom, var(--bg-deep) 70%, transparent); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
 .logo { display: flex; align-items: center; gap: 12px; }
-.logo-icon { width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, var(--accent), var(--accent-light)); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 16px; box-shadow: 0 4px 15px var(--accent-glow); }
-.logo-text { font-weight: 800; font-size: 22px; letter-spacing: -0.5px; color: #fff; }
+.logo-icon { width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(135deg, var(--accent), var(--accent-light)); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 17px; box-shadow: 0 4px 20px var(--accent-glow); }
+.logo-text { display: flex; flex-direction: column; }
+.logo-text strong { font-weight: 900; font-size: 18px; letter-spacing: -0.5px; color: #fff; line-height: 1; }
+.logo-text small { font-size: 10px; color: var(--accent-metal); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
 .header-actions { display: flex; gap: 8px; }
-.h-btn { width: 38px; height: 38px; border-radius: var(--r-sm); background: var(--surface); border: 1px solid var(--border); color: var(--text-dim); font-size: 15px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
+.h-btn { width: 40px; height: 40px; border-radius: var(--r-sm); background: var(--surface); border: 1px solid var(--border); color: var(--text-dim); font-size: 15px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
 .h-btn:active { transform: scale(0.92); background: var(--surface-2); }
+.h-btn.active { color: var(--accent-light); border-color: var(--accent); background: var(--surface-2); }
 
-.conn-bar { display: flex; align-items: center; justify-content: space-between; background: var(--surface); border: 1px solid var(--border); border-radius: 100px; padding: 10px 16px; margin-bottom: 16px; }
-.conn-left { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
-.conn-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted); flex-shrink: 0; transition: background 0.3s; }
-.conn-dot.on { background: var(--success); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); animation: pulse 2s infinite; }
+.conn-bar { display: flex; align-items: center; justify-content: space-between; background: var(--surface); border: 1px solid var(--border); border-radius: 100px; padding: 10px 18px; margin-bottom: 16px; }
+.conn-left { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1; }
+.conn-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--text-muted); flex-shrink: 0; transition: background 0.3s; position: relative; }
+.conn-dot.on { background: var(--success); box-shadow: 0 0 12px var(--success); }
 .conn-dot.err { background: var(--danger); }
 .conn-dot.sync { background: var(--accent-metal); animation: spin 1s linear infinite; }
-@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); } 70% { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); } 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); } }
 @keyframes spin { to { transform: rotate(360deg); } }
 .conn-info { display: flex; flex-direction: column; min-width: 0; }
 .conn-status { font-size: 11px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
-.conn-room { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent-metal); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; padding: 2px 0; }
+.conn-room { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent-metal); font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-.search-wrap { position: relative; margin-bottom: 16px; }
+.search-wrap { position: relative; margin-bottom: 20px; }
 .search-wrap i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 13px; pointer-events: none; }
-.search-wrap input { padding-left: 38px; }
+.search-wrap input { padding-left: 38px; border-radius: 100px; }
 .search-clear { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 26px; height: 26px; border-radius: 50%; background: var(--surface-2); border: none; color: var(--text-dim); font-size: 11px; display: none; align-items: center; justify-content: center; cursor: pointer; }
 .search-clear.show { display: flex; }
 
-.stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 24px; }
-.stat-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 14px 10px; text-align: center; position: relative; overflow: hidden; }
-.stat-box::after { content: ''; position: absolute; bottom: 0; left: 20%; right: 20%; height: 2px; background: linear-gradient(90deg, transparent, var(--accent-light), transparent); opacity: 0.5; }
-.stat-num { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 22px; color: #fff; }
-.stat-lbl { font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+.stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 28px; }
+.stat-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 16px 10px; text-align: center; position: relative; overflow: hidden; }
+.stat-box::after { content: ''; position: absolute; bottom: 0; left: 20%; right: 20%; height: 2px; background: linear-gradient(90deg, transparent, var(--accent-light), transparent); opacity: 0.6; }
+.stat-num { font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 26px; color: #fff; letter-spacing: -1px; }
+.stat-lbl { font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 6px; }
 
-.section-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
-.btn-add-cat { background: none; border: none; color: var(--accent-metal); font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 4px; }
-.btn-add-cat:active { opacity: 0.6; }
+.section-label { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
+.btn-add-cat { background: none; border: none; color: var(--accent-metal); font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 4px; }
 
-.chips-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 24px; scroll-snap-type: x mandatory; }
-.chips-scroll::-webkit-scrollbar { display: none; }
+.chips-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 12px; scroll-snap-type: x mandatory; }
 .chip { flex-shrink: 0; scroll-snap-align: start; padding: 10px 16px; border-radius: 100px; font-size: 13px; font-weight: 600; background: var(--surface); border: 1px solid var(--border); color: var(--text-dim); cursor: pointer; transition: all 0.2s; user-select: none; display: flex; align-items: center; gap: 6px; }
 .chip:active { transform: scale(0.95); }
-.chip.active { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 2px 10px var(--accent-glow); }
+.chip.active { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 4px 12px var(--accent-glow); }
 .chip-cnt { font-family: 'JetBrains Mono', monospace; font-size: 11px; background: rgba(255,255,255,0.15); padding: 1px 6px; border-radius: 100px; }
 .chip:not(.active) .chip-cnt { background: rgba(255,255,255,0.05); }
-.chip-hint { font-size: 10px; color: var(--text-muted); margin: -16px 0 20px; }
+.chip-hint { font-size: 10.5px; color: var(--text-muted); margin: 0 0 24px; text-align: center; }
 
-.list-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-.list-title { font-size: 16px; font-weight: 700; color: #fff; }
-.list-count { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-muted); }
+.list-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+.list-title { font-size: 18px; font-weight: 800; color: #fff; }
+.list-count { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--accent-metal); font-weight: 700; }
 
-.song-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-sm); margin-bottom: 10px; position: relative; overflow: hidden; animation: slideUp 0.3s ease both; transition: border-color 0.2s, background 0.2s; cursor: pointer; }
-.song-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: linear-gradient(to bottom, var(--accent-light), var(--accent)); }
-.song-card:active { border-color: var(--border-light); }
-.song-card.has-lyrics:active { background: var(--surface-2); }
-@keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.song-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-sm); margin-bottom: 12px; position: relative; overflow: hidden; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; transition: border-color 0.2s, transform 0.1s; cursor: pointer; }
+.song-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: linear-gradient(to bottom, var(--accent-light), var(--accent)); opacity: 0.8; }
+.song-card:active { transform: scale(0.99); border-color: var(--border-light); }
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-.sc-body { padding: 14px 16px 12px 20px; }
+.sc-body { padding: 16px 16px 14px 22px; }
 .sc-top { display: flex; align-items: center; gap: 14px; }
-.tom-badge { flex-shrink: 0; width: 54px; height: 54px; border-radius: 13px; background: linear-gradient(135deg, var(--gold), #d97706); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 4px 16px var(--gold-glow); }
-.tom-badge span { font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 17px; color: #1a1004; line-height: 1; letter-spacing: -0.5px; }
-.tom-badge small { font-size: 7px; font-weight: 700; color: rgba(26,16,4,0.6); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+.tom-badge { flex-shrink: 0; width: 58px; height: 58px; border-radius: 14px; background: linear-gradient(135deg, var(--gold), #d97706); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 4px 20px var(--gold-glow); }
+.tom-badge span { font-family: 'JetBrains Mono', monospace; font-weight: 900; font-size: 18px; color: #1a1004; line-height: 1; letter-spacing: -0.5px; }
+.tom-badge small { font-size: 7px; font-weight: 800; color: rgba(26,16,4,0.7); text-transform: uppercase; letter-spacing: 1px; margin-top: 3px; }
 .sc-info { flex: 1; min-width: 0; }
 .sc-name { font-size: 16px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.sc-artist { font-size: 12.5px; color: var(--text-muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.sc-chev { flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%; background: var(--bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 12px; transition: transform 0.25s ease, color 0.2s, border-color 0.2s; }
-.sc-chev.no-lyrics { opacity: 0.35; }
+.sc-artist { font-size: 12.5px; color: var(--text-muted); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sc-chev { flex-shrink: 0; width: 32px; height: 32px; border-radius: 50%; background: var(--bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 12px; transition: transform 0.3s ease, color 0.2s, border-color 0.2s; }
 .song-card.open .sc-chev { transform: rotate(180deg); color: var(--accent-metal); border-color: var(--accent-light); }
 
-.sc-tags { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+.sc-tags { display: flex; gap: 6px; margin-top: 14px; flex-wrap: wrap; }
 .tag { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500; padding: 4px 10px; border-radius: 6px; display: inline-flex; align-items: center; gap: 5px; }
 .tag-cat { background: var(--surface-2); color: var(--text-dim); border: 1px solid var(--border); }
-.tag-ord { background: var(--bg); color: var(--text-muted); }
-.tag-lyr { background: rgba(245, 158, 11, 0.12); color: var(--gold); border: 1px solid rgba(245, 158, 11, 0.3); font-family: 'Inter', sans-serif; font-weight: 600; }
+.tag-ord { background: var(--bg); color: var(--text-muted); border: 1px solid var(--border); }
+.tag-lyr { background: rgba(250, 204, 21, 0.12); color: var(--gold); border: 1px solid rgba(250, 204, 21, 0.3); font-family: 'Inter', sans-serif; font-weight: 600; }
 
-.lyrics-panel { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
-.song-card.open .lyrics-panel { max-height: 900px; }
-.lyrics-inner { padding: 4px 16px 16px 20px; }
-.lyrics-box { background: var(--bg); border-radius: var(--r-xs); border-left: 2px solid var(--gold); padding: 14px; font-size: 13.5px; line-height: 1.75; color: var(--text); white-space: pre-wrap; word-break: break-word; max-height: 340px; overflow-y: auto; }
+.lyrics-panel { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+.song-card.open .lyrics-panel { max-height: 1000px; }
+.lyrics-inner { padding: 4px 16px 16px 22px; }
+.lyrics-box { background: var(--bg); border-radius: var(--r-xs); border-left: 2px solid var(--gold); padding: 16px; font-size: 14px; line-height: 1.8; color: var(--text); white-space: pre-wrap; word-break: break-word; max-height: 400px; overflow-y: auto; }
 .lyrics-empty { color: var(--text-muted); font-style: italic; font-size: 13px; }
-.sc-obs { margin-top: 10px; font-size: 12px; color: var(--text-dim); line-height: 1.6; padding: 10px 12px; background: var(--bg); border-radius: var(--r-xs); border-left: 2px solid var(--border-light); }
+.sc-obs { margin-top: 12px; font-size: 12px; color: var(--text-dim); line-height: 1.6; padding: 10px 12px; background: var(--bg); border-radius: var(--r-xs); border-left: 2px solid var(--border-light); display: flex; gap: 8px; align-items: flex-start; }
 
-.sc-actions { display: flex; justify-content: flex-end; gap: 6px; padding: 0 12px 12px 20px; }
-.btn-ico { background: none; border: none; color: var(--text-muted); font-size: 12px; font-weight: 600; padding: 6px 10px; border-radius: var(--r-xs); cursor: pointer; display: flex; align-items: center; gap: 5px; transition: all 0.15s; }
-.btn-ico.edit:active { transform: scale(0.9); color: var(--accent-metal); background: var(--accent-glow); }
-.btn-ico.del:active { transform: scale(0.9); color: var(--danger); background: rgba(239, 68, 68, 0.1); }
+.sc-actions { display: flex; justify-content: flex-end; gap: 8px; padding: 0 16px 14px 22px; }
+.btn-ico { background: none; border: none; color: var(--text-muted); font-size: 12px; font-weight: 600; padding: 8px 12px; border-radius: var(--r-xs); cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.15s; }
+.btn-ico.edit { color: var(--accent-metal); background: var(--accent-glow); }
+.btn-ico.del { color: var(--danger); background: rgba(239, 68, 68, 0.1); }
 
-.empty { text-align: center; padding: 60px 20px; color: var(--text-muted); border: 1px dashed var(--border); border-radius: var(--r-sm); font-size: 14px; line-height: 1.6; }
-.empty i { font-size: 30px; display: block; margin-bottom: 14px; color: var(--border-light); }
+.empty { text-align: center; padding: 80px 20px; color: var(--text-muted); border: 1px dashed var(--border); border-radius: var(--r); font-size: 14px; line-height: 1.6; }
+.empty i { font-size: 40px; display: block; margin-bottom: 20px; color: var(--border-light); }
 
-.fab { position: fixed; bottom: 28px; right: 20px; width: 56px; height: 56px; border-radius: 16px; background: linear-gradient(135deg, var(--accent-light), var(--accent)); color: #fff; border: none; font-size: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 60; box-shadow: 0 4px 20px rgba(37, 99, 235, 0.5); transition: transform 0.2s; }
-.fab:active { transform: scale(0.9); }
+.fab { position: fixed; bottom: 32px; right: 24px; width: 60px; height: 60px; border-radius: 18px; background: linear-gradient(135deg, var(--accent-light), var(--accent)); color: #fff; border: none; font-size: 22px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 60; box-shadow: 0 8px 30px rgba(249, 115, 22, 0.5); transition: transform 0.2s; }
+.fab:active { transform: scale(0.88) rotate(90deg); }
 
-.overlay { position: fixed; inset: 0; z-index: 100; background: rgba(3, 5, 10, 0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; align-items: flex-end; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.25s; }
+.overlay { position: fixed; inset: 0; z-index: 100; background: rgba(10, 6, 2, 0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; align-items: flex-end; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
 .overlay.open { opacity: 1; pointer-events: all; }
-.sheet { background: var(--surface); border: 1px solid var(--border); border-radius: 24px 24px 0 0; padding: 12px 20px 40px; width: 100%; max-width: 480px; max-height: 90dvh; overflow-y: auto; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1); }
+.sheet { background: var(--surface); border: 1px solid var(--border); border-bottom: none; border-radius: 28px 28px 0 0; padding: 12px 20px 40px; width: 100%; max-width: 480px; max-height: 90dvh; overflow-y: auto; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1); }
 .overlay.open .sheet { transform: translateY(0); }
-.handle { width: 40px; height: 4px; background: var(--border-light); border-radius: 4px; margin: 0 auto 20px; }
-.sheet-title { font-size: 18px; font-weight: 800; margin-bottom: 20px; color: #fff; }
+.handle { width: 40px; height: 4px; background: var(--border-light); border-radius: 4px; margin: 0 auto 24px; }
+.sheet-title { font-size: 20px; font-weight: 800; margin-bottom: 24px; color: #fff; display: flex; align-items: center; gap: 10px; }
 .field { margin-bottom: 16px; }
-.field-lbl { display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
-.field-lbl .opt { text-transform: none; letter-spacing: 0; color: var(--text-muted); font-weight: 500; }
+.field-lbl { display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
 .row { display: grid; gap: 10px; }
 .row-2-1 { grid-template-columns: 2fr 1fr; }
-.btn { display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; font-size: 14px; border: none; border-radius: var(--r-xs); padding: 14px; width: 100%; cursor: pointer; transition: all 0.15s; }
-.btn:active { transform: scale(0.97); }
-.btn-primary { background: linear-gradient(135deg, var(--accent-light), var(--accent)); color: #fff; box-shadow: 0 2px 10px var(--accent-glow); }
-.btn-primary:disabled { opacity: 0.3; cursor: not-allowed; transform: none; box-shadow: none; }
+.btn { display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; font-size: 15px; border: none; border-radius: var(--r-xs); padding: 16px; width: 100%; cursor: pointer; transition: all 0.15s; }
+.btn-primary { background: linear-gradient(135deg, var(--accent-light), var(--accent)); color: #fff; box-shadow: 0 4px 15px var(--accent-glow); }
+.btn-primary:disabled { opacity: 0.3; cursor: not-allowed; }
 .btn-sec { background: var(--surface-2); color: var(--text-dim); border: 1px solid var(--border); margin-top: 10px; }
 
-.toast-box { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); z-index: 300; width: calc(100% - 32px); max-width: 400px; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
-.toast { background: var(--surface-2); border: 1px solid var(--border-light); border-radius: var(--r-xs); padding: 12px 16px; font-size: 13px; font-weight: 600; color: #fff; display: flex; align-items: center; gap: 10px; pointer-events: all; box-shadow: 0 8px 20px rgba(0,0,0,0.5); animation: tIn 0.3s ease, tOut 0.3s ease 2.5s forwards; }
-.toast i { font-size: 16px; }
+.toast-box { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 300; width: calc(100% - 32px); max-width: 400px; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+.toast { background: var(--surface-2); border: 1px solid var(--border-light); border-radius: var(--r-xs); padding: 14px 18px; font-size: 13px; font-weight: 600; color: #fff; display: flex; align-items: center; gap: 12px; pointer-events: all; box-shadow: 0 10px 30px rgba(0,0,0,0.5); animation: tIn 0.3s ease, tOut 0.3s ease 2.5s forwards; }
+.toast i { font-size: 18px; }
 .toast.ok i { color: var(--success); }
 .toast.err i { color: var(--danger); }
-@keyframes tIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes tOut { to { opacity: 0; transform: translateY(-10px); } }
+.toast.info i { color: var(--accent-metal); }
+@keyframes tIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes tOut { to { opacity: 0; transform: translateY(-20px); } }
 .hidden { display: none !important; }
 </style>
 </head>
@@ -161,26 +159,28 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 <div class="bg-effects"><div class="bg-orb bg-orb-1"></div><div class="bg-orb bg-orb-2"></div></div>
 <div class="toast-box" id="toasts"></div>
 
+<!-- Modal Categoria -->
 <div class="overlay" id="ovCat">
   <div class="sheet">
     <div class="handle"></div>
-    <div class="sheet-title">Nova Categoria</div>
+    <div class="sheet-title"><i class="fa-solid fa-tags"></i> Nova Categoria</div>
     <div class="field">
       <label class="field-lbl">Nome da categoria</label>
-      <input type="text" id="inCatName" placeholder="Ex: Adoracao, Sertanejo...">
+      <input type="text" id="inCatName" placeholder="Ex: Louvor, Adoração, Entrada...">
     </div>
     <button class="btn btn-primary" id="btnSaveCat">Criar Categoria</button>
     <button class="btn btn-sec" id="btnCancelCat">Cancelar</button>
   </div>
 </div>
 
+<!-- Modal Música -->
 <div class="overlay" id="ovSong">
   <div class="sheet">
     <div class="handle"></div>
-    <div class="sheet-title" id="songSheetTitle">Nova Musica</div>
+    <div class="sheet-title" id="songSheetTitle"><i class="fa-solid fa-music"></i> Nova Música</div>
     <div class="field">
-      <label class="field-lbl">Nome da musica</label>
-      <input type="text" id="inName" placeholder="Nome da musica">
+      <label class="field-lbl">Nome da música</label>
+      <input type="text" id="inName" placeholder="Nome da música">
     </div>
     <div class="field row row-2-1">
       <div><label class="field-lbl">Tom</label><input type="text" id="inTom" placeholder="Ex: Am, C..."></div>
@@ -195,14 +195,14 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
       <select id="inCat"></select>
     </div>
     <div class="field">
-      <label class="field-lbl">Letra <span class="opt">(opcional — toque na musica na lista pra ver)</span></label>
+      <label class="field-lbl">Letra <span class="opt">(opcional)</span></label>
       <textarea id="inLetra" rows="6" placeholder="Cole ou digite a letra aqui..."></textarea>
     </div>
     <div class="field">
-      <label class="field-lbl">Observacao</label>
+      <label class="field-lbl">Observação</label>
       <textarea id="inObs" rows="2" placeholder="Opcional"></textarea>
     </div>
-    <button class="btn btn-primary" id="btnSaveSong" disabled>Adicionar Musica</button>
+    <button class="btn btn-primary" id="btnSaveSong" disabled>Adicionar Música</button>
     <button class="btn btn-sec" id="btnCancelSong">Cancelar</button>
   </div>
 </div>
@@ -210,10 +210,14 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 <div class="app">
   <header class="header">
     <div class="logo">
-      <div class="logo-icon"><i class="fa-solid fa-list-ol"></i></div>
-      <div class="logo-text">SetList</div>
+      <div class="logo-icon"><i class="fa-solid fa-fire-flame-curved"></i></div>
+      <div class="logo-text">
+        <strong>SetList</strong>
+        <small>Renovação</small>
+      </div>
     </div>
     <div class="header-actions">
+      <button class="h-btn" id="btnWake" title="Manter tela acesa"><i class="fa-solid fa-mug-hot"></i></button>
       <button class="h-btn" id="btnPdf" title="Exportar PDF"><i class="fa-solid fa-file-pdf"></i></button>
     </div>
   </header>
@@ -223,19 +227,19 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
       <div class="conn-dot sync" id="connDot"></div>
       <div class="conn-info">
         <div class="conn-status" id="connStatus">Conectando...</div>
-        <div class="conn-room" id="connRoom" title="Toque para copiar">---</div>
+        <div class="conn-room" id="connRoom">Ministério</div>
       </div>
     </div>
   </div>
 
   <div class="search-wrap">
     <i class="fa-solid fa-magnifying-glass"></i>
-    <input type="text" id="inSearch" placeholder="Buscar musica ou artista...">
+    <input type="text" id="inSearch" placeholder="Buscar música ou artista...">
     <button class="search-clear" id="btnClearSearch"><i class="fa-solid fa-xmark"></i></button>
   </div>
 
   <div class="stats-grid">
-    <div class="stat-box"><div class="stat-num" id="stMus">0</div><div class="stat-lbl">Musicas</div></div>
+    <div class="stat-box"><div class="stat-num" id="stMus">0</div><div class="stat-lbl">Músicas</div></div>
     <div class="stat-box"><div class="stat-num" id="stCat">0</div><div class="stat-lbl">Categorias</div></div>
     <div class="stat-box"><div class="stat-num" id="stTom">0</div><div class="stat-lbl">Tons</div></div>
   </div>
@@ -245,17 +249,17 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
     <button class="btn-add-cat" id="btnOpenCat"><i class="fa-solid fa-plus"></i> Nova</button>
   </div>
   <div class="chips-scroll" id="chips"></div>
-  <div class="chip-hint">Segure uma categoria pra excluir</div>
+  <div class="chip-hint">Dica: Segure uma categoria para excluí-la</div>
 
   <div class="list-head">
-    <div class="list-title" id="listTitle">Todas as Musicas</div>
+    <div class="list-title" id="listTitle">Todas as Músicas</div>
     <div class="list-count" id="listCount">0</div>
   </div>
 
   <div id="songList"></div>
   <div class="empty" id="emptyMsg">
     <i class="fa-regular fa-folder-open"></i>
-    Nenhuma musica aqui ainda.<br>Toque no <strong>+</strong> para comecar.
+    Nenhuma música aqui ainda.<br>Toque no <strong>+</strong> para começar.
   </div>
 </div>
 
@@ -265,96 +269,192 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 (function() {
   "use strict";
 
-  // ID fixo da sala — ja esta pronto, so abrir e usar
-  var BIN_ID = '6a729248da38895dfebacd88';
-
-  var API_KEY = '$2a$10$oxPjSemP6.ZbivpbS4Ycp.GEfwwE5bV3K7ddo522WVY38ic838lr.';
-  var API_URL = 'https://api.jsonbin.io/v3';
-  var HEADERS = { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY };
-
+  // ================== CONFIG ==================
+  var FIXED_PEER_ID = 'rcc-renovacao-setlist-master-v1'; // ID fixo para todos entrarem na mesma sala
+  
+  // ================== STATE ==================
   var data = { cats: [], songs: [], ts: 0 };
   var activeCat = "all";
   var searchTerm = "";
   var openLyrics = {};
   var editingId = null;
-  var syncTimer = null;
-  var isSyncing = false;
+
+  // PeerJS State
+  var peer = null;
+  var connections = []; 
+  var hostConn = null; 
+  var isHost = false;
+  var wakeLock = null;
 
   var $ = function(id) { return document.getElementById(id); };
 
-  // ---------- Copiar ID ----------
-  function copyText(text) {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(function() { toast('ID copiado!'); }).catch(function() { fbCopy(text); });
-    } else { fbCopy(text); }
-  }
-  function fbCopy(text) {
-    var ta = document.createElement('textarea');
-    ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
-    document.body.appendChild(ta); ta.select();
-    try { document.execCommand('copy'); toast('ID copiado!'); } catch(e) { toast('Erro ao copiar', 'err'); }
-    document.body.removeChild(ta);
-  }
-
-  // ---------- JSONBin ----------
-  function fetchBin() {
-    if (isSyncing) return;
-    isSyncing = true;
-    fetch(API_URL + '/b/' + BIN_ID + '/latest', { headers: HEADERS })
-      .then(function(r) { if (!r.ok) throw new Error(r.status); return r.json(); })
-      .then(function(json) {
-        var remote = json.record;
-        if (remote.ts > data.ts) {
-          data.cats = remote.cats || [];
-          data.songs = remote.songs || [];
-          data.ts = remote.ts;
-          saveLocal(); render();
-        }
-        setUI('Sincronizado', 'on');
-      })
-      .catch(function() { setUI('Offline', 'err'); })
-      .finally(function() { isSyncing = false; });
-  }
-
-  function pushBin() {
-    data.ts = Date.now();
-    fetch(API_URL + '/b/' + BIN_ID, {
-      method: 'PUT', headers: HEADERS,
-      body: JSON.stringify({ cats: data.cats, songs: data.songs, ts: data.ts })
-    })
-      .then(function(r) { if (!r.ok) throw new Error(r.status); saveLocal(); setUI('Salvo na nuvem', 'on'); })
-      .catch(function() { setUI('Sem internet', 'err'); toast('Salvo apenas no celular', 'err'); });
-  }
-
-  function startSync() {
-    if (syncTimer) clearInterval(syncTimer);
-    fetchBin();
-    syncTimer = setInterval(fetchBin, 4000);
-  }
-
-  // ---------- Local ----------
-  function saveLocal() { localStorage.setItem('setlist_data', JSON.stringify(data)); }
-  function loadLocal() { try { var d = JSON.parse(localStorage.getItem('setlist_data')); if (d && Array.isArray(d.songs)) data = d; } catch(e) {} }
-
-  // ---------- UI ----------
+  // ================== UTILITIES ==================
+  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+  function esc(s) { var d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
   function toast(msg, type) {
     type = type || 'ok';
     var t = document.createElement('div');
     t.className = 'toast ' + type;
-    t.innerHTML = '<i class="fa-solid ' + (type === 'err' ? 'fa-circle-xmark' : 'fa-circle-check') + '"></i>' + esc(msg);
+    var icon = type === 'err' ? 'fa-circle-xmark' : (type === 'info' ? 'fa-circle-info' : 'fa-circle-check');
+    t.innerHTML = '<i class="fa-solid ' + icon + '"></i>' + esc(msg);
     $('toasts').appendChild(t);
     setTimeout(function() { if (t.parentNode) t.remove(); }, 3200);
   }
-  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
-  function esc(s) { var d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
-  function setUI(status, color) {
-    $('connStatus').textContent = status;
-    $('connRoom').textContent = 'ID: ' + BIN_ID;
-    $('connDot').className = 'conn-dot ' + color;
+
+  // ================== WAKE LOCK (Tela acesa) ==================
+  async function toggleWakeLock() {
+    try {
+      if (wakeLock) {
+        await wakeLock.release();
+        wakeLock = null;
+        $('btnWake').classList.remove('active');
+        toast('Tela pode apagar agora', 'info');
+      } else {
+        wakeLock = await navigator.wakeLock.request('screen');
+        $('btnWake').classList.add('active');
+        toast('Tela sempre acesa ativada', 'ok');
+        wakeLock.addEventListener('release', () => {
+          $('btnWake').classList.remove('active');
+        });
+      }
+    } catch (err) {
+      toast('Navegador não suporta manter a tela acesa', 'err');
+    }
+  }
+  $('btnWake').addEventListener('click', toggleWakeLock);
+  // Re-ativa o wake lock se a pessoa trocar de aba e voltar
+  document.addEventListener('visibilitychange', async () => {
+    if (wakeLock !== null && document.visibilityState === 'visible') {
+      try { wakeLock = await navigator.wakeLock.request('screen'); } catch(e) {}
+    }
+  });
+
+  // ================== LOCAL STORAGE ==================
+  function saveLocal() { localStorage.setItem('setlist_data', JSON.stringify(data)); }
+  function loadLocal() { 
+    try { 
+      var d = JSON.parse(localStorage.getItem('setlist_data')); 
+      if (d && Array.isArray(d.songs)) data = d; 
+    } catch(e) {} 
   }
 
-  $('connRoom').addEventListener('click', function() { copyText(BIN_ID); });
+  // ================== PEERJS AUTO-CONNECT LOGIC ==================
+  function setConnUI(status, sub, dotClass) {
+    $('connStatus').textContent = status;
+    $('connRoom').textContent = sub || '---';
+    $('connDot').className = 'conn-dot ' + dotClass;
+  }
 
+  function initNetwork() {
+    if (peer) peer.destroy();
+    setConnUI('Conectando...', 'Ministério', 'sync');
+    
+    // Tenta ser o Host (Servidor principal)
+    peer = new Peer(FIXED_PEER_ID, { debug: 1 });
+
+    peer.on('open', function() {
+      // Sucesso! Esta pessoa é a Host.
+      isHost = true;
+      setConnUI('Host Ativo', 'Você é a sala principal', 'on');
+      broadcastData(); // Envia dados atuais se alguém já estiver esperando
+    });
+
+    // Se alguém tentar conectar nela (como cliente)
+    peer.on('connection', function(conn) {
+      connections.push(conn);
+      conn.on('open', function() {
+        toast('Instrumentista conectado!', 'info');
+        conn.send({ type: 'sync', payload: data });
+      });
+      conn.on('data', function(d) { handleData(d, conn); });
+      conn.on('close', function() {
+        connections = connections.filter(function(c) { return c !== conn; });
+      });
+    });
+
+    // Se o ID fixo já estiver em uso, significa que JÁ EXISTE um Host. Vire Cliente.
+    peer.on('error', function(err) {
+      if (err.type === 'unavailable-id') {
+        isHost = false;
+        peer.destroy(); // Limpa a tentativa de host
+        becomeClient(); // Vira cliente e conecta no host existente
+      } else {
+        setConnUI('Desconectado', 'Sem internet', 'err');
+        setTimeout(initNetwork, 5000); // Tenta novamente em 5s
+      }
+    });
+  }
+
+  function becomeClient() {
+    setConnUI('Conectando...', 'Procurando sala', 'sync');
+    var clientId = 'rcc-client-' + uid();
+    peer = new Peer(clientId, { debug: 1 });
+
+    peer.on('open', function() {
+      hostConn = peer.connect(FIXED_PEER_ID, { reliable: true });
+      
+      hostConn.on('open', function() {
+        setConnUI('Conectado', 'Ministério', 'on');
+      });
+
+      hostConn.on('data', function(d) { handleData(d, hostConn); });
+      
+      hostConn.on('close', function() {
+        setConnUI('Sala saiu', 'Reconectando...', 'sync');
+        setTimeout(initNetwork, 3000); // Se o host sair, tenta virar host de novo
+      });
+
+      hostConn.on('error', function() {
+        setTimeout(initNetwork, 3000);
+      });
+    });
+  }
+
+  function handleData(d, conn) {
+    if (d.type === 'update') {
+      // Cliente enviou mudança para o Host
+      if (isHost) {
+        data = d.payload;
+        saveLocal();
+        render();
+        broadcastData(); // Relay para os outros clientes
+      }
+    } else if (d.type === 'sync') {
+      // Host enviando estado completo para o Cliente
+      if (!isHost) {
+        if (d.payload.ts > data.ts) {
+          data = d.payload;
+          saveLocal();
+          render();
+        }
+      }
+    }
+  }
+
+  function broadcastData() {
+    if (!isHost) return;
+    connections.forEach(function(conn) {
+      if (conn.open) {
+        conn.send({ type: 'sync', payload: data });
+      }
+    });
+  }
+
+  function syncData() {
+    data.ts = Date.now();
+    saveLocal();
+    render();
+    
+    if (isHost) {
+      broadcastData();
+    } else if (hostConn && hostConn.open) {
+      hostConn.send({ type: 'update', payload: data });
+    } else {
+      toast('Sem conexão. Salvo local.', 'err');
+    }
+  }
+
+  // ================== UI RENDERING ==================
   function updateStats() {
     $('stMus').textContent = data.songs.length;
     $('stCat').textContent = data.cats.length;
@@ -363,19 +463,6 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
     $('stTom').textContent = Object.keys(tons).length;
   }
 
-  // ---------- Busca ----------
-  $('inSearch').addEventListener('input', function() {
-    searchTerm = $('inSearch').value.trim().toLowerCase();
-    $('btnClearSearch').classList.toggle('show', searchTerm.length > 0);
-    renderSongs();
-  });
-  $('btnClearSearch').addEventListener('click', function() {
-    $('inSearch').value = ''; searchTerm = '';
-    $('btnClearSearch').classList.remove('show');
-    renderSongs(); $('inSearch').focus();
-  });
-
-  // ---------- Chips ----------
   function renderChips() {
     var el = $('chips'); el.innerHTML = '';
     var all = document.createElement('div');
@@ -383,17 +470,28 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
     all.innerHTML = 'Todas <span class="chip-cnt">' + data.songs.length + '</span>';
     all.addEventListener('click', function() { activeCat = 'all'; renderSongs(); renderChips(); });
     el.appendChild(all);
+    
     data.cats.forEach(function(c) {
       var ch = document.createElement('div');
       ch.className = 'chip' + (activeCat === c.id ? ' active' : '');
       var cnt = data.songs.filter(function(s) { return s.catId === c.id; }).length;
       ch.innerHTML = esc(c.name) + ' <span class="chip-cnt">' + cnt + '</span>';
+      
       var timer = null, isLong = false;
-      ch.addEventListener('touchstart', function() { isLong = false; timer = setTimeout(function() { isLong = true; deleteCat(c.id); }, 500); }, { passive: true });
-      ch.addEventListener('touchend', function(e) { clearTimeout(timer); if (!isLong) { activeCat = c.id; renderSongs(); renderChips(); } e.preventDefault(); });
+      ch.addEventListener('touchstart', function() { 
+        isLong = false; 
+        timer = setTimeout(function() { isLong = true; deleteCat(c.id); }, 500); 
+      }, { passive: true });
+      ch.addEventListener('touchend', function(e) { 
+        clearTimeout(timer); 
+        if (!isLong) { activeCat = c.id; renderSongs(); renderChips(); } 
+        e.preventDefault(); 
+      });
       ch.addEventListener('touchmove', function() { clearTimeout(timer); }, { passive: true });
       ch.addEventListener('contextmenu', function(e) { e.preventDefault(); deleteCat(c.id); });
-      ch.addEventListener('click', function() { if (!('ontouchstart' in window)) { activeCat = c.id; renderSongs(); renderChips(); } });
+      ch.addEventListener('click', function() { 
+        if (!('ontouchstart' in window)) { activeCat = c.id; renderSongs(); renderChips(); } 
+      });
       el.appendChild(ch);
     });
     setTimeout(function() { var a = el.querySelector('.active'); if (a) a.scrollIntoView({ behavior: 'smooth', inline: 'center' }); }, 50);
@@ -406,19 +504,18 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
     if (data.cats.find(function(c) { return c.id === val; })) sel.value = val;
   }
 
-  // ---------- Musicas ----------
   function renderSongs() {
     var list = getFiltered(), el = $('songList'); el.innerHTML = '';
     $('emptyMsg').classList.toggle('hidden', list.length > 0);
     $('listCount').textContent = list.length;
     var catObj = data.cats.find(function(c) { return c.id === activeCat; });
-    $('listTitle').textContent = activeCat === 'all' ? 'Todas as Musicas' : (catObj ? catObj.name : '—');
+    $('listTitle').textContent = activeCat === 'all' ? 'Todas as Músicas' : (catObj ? catObj.name : '—');
 
     if (list.length === 0 && searchTerm) {
       $('emptyMsg').innerHTML = '<i class="fa-solid fa-magnifying-glass"></i>Nenhum resultado para "' + esc(searchTerm) + '".';
       $('emptyMsg').classList.remove('hidden');
     } else if (list.length === 0) {
-      $('emptyMsg').innerHTML = '<i class="fa-regular fa-folder-open"></i>Nenhuma musica aqui ainda.<br>Toque no <strong>+</strong> para comecar.';
+      $('emptyMsg').innerHTML = '<i class="fa-regular fa-folder-open"></i>Nenhuma música aqui ainda.<br>Toque no <strong>+</strong> para começar.';
     }
 
     list.forEach(function(s, i) {
@@ -426,21 +523,22 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
       var isOpen = !!openLyrics[s.id];
       var card = document.createElement('div');
       card.className = 'song-card' + (hasLyrics ? ' has-lyrics' : '') + (isOpen ? ' open' : '');
-      card.style.animationDelay = (i * 0.03) + 's';
+      card.style.animationDelay = (i * 0.04) + 's';
       var cat = data.cats.find(function(c) { return c.id === s.catId; });
+      
       var artistH = s.artist ? '<div class="sc-artist">' + esc(s.artist) + '</div>' : '';
-      var obsH = s.obs ? '<div class="sc-obs"><i class="fa-solid fa-note-sticky"></i> ' + esc(s.obs) + '</div>' : '';
+      var obsH = s.obs ? '<div class="sc-obs"><i class="fa-solid fa-note-sticky"></i><span>' + esc(s.obs) + '</span></div>' : '';
       var catH = cat ? '<span class="tag tag-cat">' + esc(cat.name) + '</span>' : '';
       var ordH = s.order ? '<span class="tag tag-ord">#' + esc(String(s.order)) + '</span>' : '';
       var lyrH = hasLyrics ? '<span class="tag tag-lyr"><i class="fa-solid fa-align-left"></i> Letra</span>' : '';
-      var lyricsBody = hasLyrics ? esc(s.letra) : '<span class="lyrics-empty">Nenhuma letra cadastrada. Toque em editar pra adicionar.</span>';
+      var lyricsBody = hasLyrics ? esc(s.letra) : '<span class="lyrics-empty">Nenhuma letra cadastrada. Toque em editar para adicionar.</span>';
 
       card.innerHTML =
         '<div class="sc-body">' +
           '<div class="sc-top">' +
             '<div class="tom-badge"><span>' + esc(s.tom) + '</span><small>tom</small></div>' +
             '<div class="sc-info"><div class="sc-name">' + esc(s.name) + '</div>' + artistH + '</div>' +
-            '<div class="sc-chev' + (hasLyrics ? '' : ' no-lyrics') + '"><i class="fa-solid fa-chevron-down"></i></div>' +
+            '<div class="sc-chev"><i class="fa-solid fa-chevron-down"></i></div>' +
           '</div>' +
           '<div class="sc-tags">' + lyrH + catH + ' ' + ordH + '</div>' +
           obsH +
@@ -452,7 +550,7 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
         '</div>';
 
       card.addEventListener('click', function() {
-        if (!hasLyrics) { toast('Sem letra cadastrada pra essa musica', 'err'); return; }
+        if (!hasLyrics) { toast('Sem letra cadastrada', 'err'); return; }
         openLyrics[s.id] = !openLyrics[s.id];
         card.classList.toggle('open');
       });
@@ -461,7 +559,7 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
         e.stopPropagation();
         data.songs = data.songs.filter(function(x) { return x.id !== s.id; });
         delete openLyrics[s.id];
-        saveLocal(); pushBin(); render(); toast('Removida');
+        syncData(); toast('Removida');
       });
       el.appendChild(card);
     });
@@ -480,9 +578,26 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 
   function render() { updateStats(); renderChips(); renderSongs(); updateCatSelect(); }
 
-  // ---------- CRUD Categoria ----------
-  function addCat(name) { data.cats.push({ id: uid(), name: name.trim() }); saveLocal(); pushBin(); render(); }
-  function deleteCat(id) { data.cats = data.cats.filter(function(c) { return c.id !== id; }); data.songs = data.songs.filter(function(s) { return s.catId !== id; }); if (activeCat === id) activeCat = 'all'; saveLocal(); pushBin(); render(); toast('Categoria removida'); }
+  // ================== CRUD ==================
+  function addCat(name) { data.cats.push({ id: uid(), name: name.trim() }); syncData(); }
+  function deleteCat(id) { 
+    data.cats = data.cats.filter(function(c) { return c.id !== id; }); 
+    data.songs = data.songs.filter(function(s) { return s.catId !== id; }); 
+    if (activeCat === id) activeCat = 'all'; 
+    syncData(); toast('Categoria removida'); 
+  }
+
+  // ================== EVENT LISTENERS ==================
+  $('inSearch').addEventListener('input', function() {
+    searchTerm = $('inSearch').value.trim().toLowerCase();
+    $('btnClearSearch').classList.toggle('show', searchTerm.length > 0);
+    renderSongs();
+  });
+  $('btnClearSearch').addEventListener('click', function() {
+    $('inSearch').value = ''; searchTerm = '';
+    $('btnClearSearch').classList.remove('show');
+    renderSongs(); $('inSearch').focus();
+  });
 
   function openCat() { $('ovCat').classList.add('open'); $('inCatName').value = ''; setTimeout(function() { $('inCatName').focus(); }, 300); }
   function closeCat() { $('ovCat').classList.remove('open'); }
@@ -493,11 +608,10 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
   $('btnSaveCat').addEventListener('click', function() {
     var n = $('inCatName').value.trim();
     if (!n) { toast('Digite um nome', 'err'); return; }
-    if (data.cats.find(function(c) { return c.name.toLowerCase() === n.toLowerCase(); })) { toast('Ja existe', 'err'); return; }
+    if (data.cats.find(function(c) { return c.name.toLowerCase() === n.toLowerCase(); })) { toast('Já existe', 'err'); return; }
     addCat(n); closeCat(); toast('Categoria criada');
   });
 
-  // ---------- Musica ----------
   function openSong(id) {
     if (data.cats.length === 0) addCat('Geral');
     updateCatSelect();
@@ -506,20 +620,16 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
       var s = data.songs.find(function(x) { return x.id === editingId; });
       if (!s) { editingId = null; }
       else {
-        $('songSheetTitle').textContent = 'Editar Musica';
-        $('btnSaveSong').textContent = 'Salvar Alteracoes';
-        $('inName').value = s.name || '';
-        $('inTom').value = s.tom || '';
-        $('inOrd').value = s.order || '';
-        $('inArtist').value = s.artist || '';
-        $('inCat').value = s.catId || '';
-        $('inLetra').value = s.letra || '';
-        $('inObs').value = s.obs || '';
+        $('songSheetTitle').innerHTML = '<i class="fa-solid fa-music"></i> Editar Música';
+        $('btnSaveSong').textContent = 'Salvar Alterações';
+        $('inName').value = s.name || ''; $('inTom').value = s.tom || ''; $('inOrd').value = s.order || '';
+        $('inArtist').value = s.artist || ''; $('inCat').value = s.catId || '';
+        $('inLetra').value = s.letra || ''; $('inObs').value = s.obs || '';
       }
     }
     if (!editingId) {
-      $('songSheetTitle').textContent = 'Nova Musica';
-      $('btnSaveSong').textContent = 'Adicionar Musica';
+      $('songSheetTitle').innerHTML = '<i class="fa-solid fa-music"></i> Nova Música';
+      $('btnSaveSong').textContent = 'Adicionar Música';
       $('inName').value = ''; $('inTom').value = ''; $('inOrd').value = '';
       $('inArtist').value = ''; $('inCat').value = ''; $('inLetra').value = ''; $('inObs').value = '';
     }
@@ -534,53 +644,97 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
   function checkForm() { $('btnSaveSong').disabled = !($('inName').value.trim() && $('inTom').value.trim()); }
   $('inName').addEventListener('input', checkForm);
   $('inTom').addEventListener('input', checkForm);
+  
   $('btnSaveSong').addEventListener('click', function() {
     var name = $('inName').value.trim(), tom = $('inTom').value.trim();
     if (!name || !tom) return;
     var catId = $('inCat').value;
     if (!catId && data.cats.length > 0) catId = data.cats[0].id;
-    var payload = { name: name, tom: tom, artist: $('inArtist').value.trim(), obs: $('inObs').value.trim(), letra: $('inLetra').value.trim(), catId: catId || '', order: parseInt($('inOrd').value) || 0 };
+    var payload = { 
+      name: name, tom: tom, artist: $('inArtist').value.trim(), 
+      obs: $('inObs').value.trim(), letra: $('inLetra').value.trim(), 
+      catId: catId || '', order: parseInt($('inOrd').value) || 0 
+    };
     if (editingId) {
       var s = data.songs.find(function(x) { return x.id === editingId; });
       if (s) { Object.assign(s, payload); }
-      saveLocal(); pushBin(); closeSong(); render(); toast('Musica atualizada');
+      toast('Música atualizada');
     } else {
       payload.id = uid();
       data.songs.push(payload);
-      saveLocal(); pushBin(); closeSong(); render(); toast('Musica adicionada');
+      toast('Música adicionada');
     }
+    closeSong();
+    syncData();
   });
 
-  // ---------- PDF ----------
   $('btnPdf').addEventListener('click', function() {
-    if (!data.songs.length) { toast('Adicione musicas primeiro', 'err'); return; }
+    if (!data.songs.length) { toast('Adicione músicas primeiro', 'err'); return; }
     var jsPDF = window.jspdf.jsPDF;
     var doc = new jsPDF({ unit: 'mm', format: 'a4' });
     var pw = doc.internal.pageSize.getWidth(), mg = 15, y = 15;
-    doc.setFillColor(4, 6, 13); doc.rect(0, 0, pw, 35, 'F');
-    doc.setFillColor(37, 99, 235); doc.rect(0, 35, pw, 1, 'F');
-    doc.setTextColor(96, 165, 250); doc.setFontSize(22); doc.setFont('helvetica', 'bold'); doc.text('SETLIST', mg, y);
+    
+    doc.setFillColor(26, 16, 4); doc.rect(0, 0, pw, 35, 'F');
+    doc.setFillColor(234, 88, 12); doc.rect(0, 35, pw, 1, 'F');
+    doc.setTextColor(251, 146, 60); doc.setFontSize(22); doc.setFont('helvetica', 'bold'); doc.text('SETLIST RENOVACAO', mg, y);
     y += 7;
-    doc.setTextColor(148, 163, 184); doc.setFontSize(9); doc.setFont('helvetica', 'normal');
-    doc.text('Sala: ' + BIN_ID + '  |  ' + new Date().toLocaleDateString('pt-BR') + '  |  ' + data.songs.length + ' musicas', mg, y);
+    doc.setTextColor(214, 184, 138); doc.setFontSize(9); doc.setFont('helvetica', 'normal');
+    doc.text(new Date().toLocaleDateString('pt-BR') + '  |  ' + data.songs.length + ' musicas', mg, y);
     y = 48;
+    
     var catsToPrint = activeCat === 'all' ? data.cats : data.cats.filter(function(c) { return c.id === activeCat; });
-    if (!catsToPrint.length) { y = printGroup(doc, data.songs, 'Geral', y, mg, pw); }
-    else { catsToPrint.forEach(function(cat) { var cs = data.songs.filter(function(s) { return s.catId === cat.id; }).sort(function(a,b) { return (a.order||999)-(b.order||999); }); if (!cs.length) return; if (y > 260) { doc.addPage(); y = 20; } doc.setFillColor(37,99,235); doc.rect(mg, y, pw-mg*2, 7, 'F'); doc.setTextColor(255,255,255); doc.setFontSize(10); doc.setFont('helvetica','bold'); doc.text(cat.name.toUpperCase(), mg+4, y+5); y += 12; cs.forEach(function(s,i) { if (y>275) { doc.addPage(); y=20; } if (i%2===0) { doc.setFillColor(10,17,40); doc.rect(mg, y-2, pw-mg*2, 11, 'F'); } doc.setTextColor(226,232,240); doc.setFontSize(10); doc.setFont('helvetica','bold'); doc.text(s.name, mg+4, y+3); doc.setTextColor(96,165,250); var tw=doc.getTextWidth(s.tom); doc.text(s.tom, pw-mg-tw, y+3); if (s.artist) { doc.setTextColor(71,85,105); doc.setFontSize(8); doc.setFont('helvetica','normal'); doc.text(s.artist, mg+4, y+7.5); y+=14; } else y+=11; }); y+=8; }); }
-    for (var i = 1; i <= doc.internal.getNumberOfPages(); i++) { doc.setPage(i); doc.setTextColor(71,85,105); doc.setFontSize(8); doc.text(i+'/'+doc.internal.getNumberOfPages(), pw/2, 290, {align:'center'}); }
-    doc.save('SetList.pdf'); toast('PDF baixado');
-  });
-  function printGroup(doc, list, title, y, mg, pw) {
-    if (y>260) { doc.addPage(); y=20; } doc.setFillColor(37,99,235); doc.rect(mg,y,pw-mg*2,7,'F'); doc.setTextColor(255,255,255); doc.setFontSize(10); doc.setFont('helvetica','bold'); doc.text(title.toUpperCase(), mg+4, y+5); y+=12;
-    list.sort(function(a,b) { return (a.order||999)-(b.order||999); }).forEach(function(s,i) { if (y>275) { doc.addPage(); y=20; } if (i%2===0) { doc.setFillColor(10,17,40); doc.rect(mg,y-2,pw-mg*2,11,'F'); } doc.setTextColor(226,232,240); doc.setFontSize(10); doc.setFont('helvetica','bold'); doc.text(s.name, mg+4, y+3); doc.setTextColor(96,165,250); var tw=doc.getTextWidth(s.tom); doc.text(s.tom, pw-mg-tw, y+3); if (s.artist) { doc.setTextColor(71,85,105); doc.setFontSize(8); doc.setFont('helvetica','normal'); doc.text(s.artist, mg+4, y+7.5); y+=14; } else y+=11; }); return y+8;
-  }
+    
+    function printGroup(list, title) {
+      if (y > 260) { doc.addPage(); y = 20; }
+      doc.setFillColor(234,88,12); doc.rect(mg, y, pw-mg*2, 7, 'F');
+      doc.setTextColor(255,255,255); doc.setFontSize(10); doc.setFont('helvetica','bold');
+      doc.text(title.toUpperCase(), mg+4, y+5);
+      y += 12;
+      
+      list.sort(function(a,b) { return (a.order||999)-(b.order||999); }).forEach(function(s, i) {
+        if (y > 275) { doc.addPage(); y = 20; }
+        if (i % 2 === 0) { doc.setFillColor(34,26,16); doc.rect(mg, y-2, pw-mg*2, 11, 'F'); }
+        doc.setTextColor(254,243,199); doc.setFontSize(10); doc.setFont('helvetica','bold');
+        doc.text(s.name, mg+4, y+3);
+        doc.setTextColor(251,146,60); 
+        var tw = doc.getTextWidth(s.tom);
+        doc.text(s.tom, pw-mg-tw, y+3);
+        
+        if (s.artist) {
+          doc.setTextColor(138,114,80); doc.setFontSize(8); doc.setFont('helvetica','normal');
+          doc.text(s.artist, mg+4, y+7.5);
+          y += 14;
+        } else {
+          y += 11;
+        }
+      });
+      y += 8;
+    }
 
-  // ==========================================
-  // INICIO — conecta direto, sem nenhum passo
-  // ==========================================
+    if (!catsToPrint.length) {
+      printGroup(data.songs, 'Geral');
+    } else {
+      catsToPrint.forEach(function(cat) {
+        var cs = data.songs.filter(function(s) { return s.catId === cat.id; });
+        if (!cs.length) return;
+        printGroup(cs, cat.name);
+      });
+    }
+    
+    var totalPages = doc.internal.getNumberOfPages();
+    for (var i = 1; i <= totalPages; i++) {
+      doc.setPage(i);
+      doc.setTextColor(138,114,80); doc.setFontSize(8);
+      doc.text(i + '/' + totalPages, pw/2, 290, { align: 'center' });
+    }
+    
+    doc.save('SetList_Renovacao.pdf'); toast('PDF gerado');
+  });
+
+  // ================== INIT ==================
   loadLocal();
   render();
-  startSync();
+  initNetwork();
 
 })();
 </script>
