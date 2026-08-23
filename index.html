@@ -177,6 +177,8 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 .toast.ok i { color: var(--success); }
 .toast.err i { color: var(--danger); }
 .toast.info i { color: var(--accent-metal); }
+.toast.alert { border-color: var(--gold); background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), var(--surface-solid)); }
+.toast.alert i { color: var(--gold); }
 @keyframes tIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes tOut { to { opacity: 0; transform: translateY(-20px); } }
 .hidden { display: none !important; }
@@ -257,6 +259,7 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
       </div>
     </div>
     <div class="header-actions">
+      <button class="h-btn" id="btnAlert" title="Enviar aviso"><i class="fa-solid fa-bullhorn"></i></button>
       <button class="h-btn" id="btnWake" title="Manter tela acesa"><i class="fa-solid fa-mug-hot"></i></button>
       <button class="h-btn" id="btnPdf" title="Exportar PDF"><i class="fa-solid fa-file-pdf"></i></button>
     </div>
@@ -304,7 +307,7 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
   "use strict";
 
   // ================== CONFIG ==================
-  var FIXED_PEER_ID = 'rcc-renovacao-setlist-master-v3'; // ID fixo
+  var FIXED_PEER_ID = 'rcc-renovacao-setlist-master-v4'; // ID fixo (Rede Igualitária)
   
   // ================== STATE ==================
   var data = { cats: [], songs: [], ts: 0 };
@@ -327,10 +330,16 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
     type = type || 'ok';
     var t = document.createElement('div');
     t.className = 'toast ' + type;
-    var icon = type === 'err' ? 'fa-circle-xmark' : (type === 'info' ? 'fa-circle-info' : 'fa-circle-check');
+    var icon = type === 'err' ? 'fa-circle-xmark' : (type === 'info' ? 'fa-circle-info' : (type === 'alert' ? 'fa-bullhorn' : 'fa-circle-check'));
     t.innerHTML = '<i class="fa-solid ' + icon + '"></i>' + esc(msg);
     $('toasts').appendChild(t);
-    setTimeout(function() { if (t.parentNode) t.remove(); }, 3200);
+    
+    // Vibração para alertas
+    if (type === 'alert' && navigator.vibrate) {
+      navigator.vibrate([100, 50, 100]);
+    }
+    
+    setTimeout(function() { if (t.parentNode) t.remove(); }, 4000);
   }
 
   // ================== WAKE LOCK ==================
@@ -359,15 +368,15 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
   });
 
   // ================== LOCAL STORAGE ==================
-  function saveLocal() { localStorage.setItem('setlist_data_v3', JSON.stringify(data)); }
+  function saveLocal() { localStorage.setItem('setlist_data_v4', JSON.stringify(data)); }
   function loadLocal() { 
     try { 
-      var d = JSON.parse(localStorage.getItem('setlist_data_v3')); 
+      var d = JSON.parse(localStorage.getItem('setlist_data_v4')); 
       if (d && Array.isArray(d.songs)) data = d; 
     } catch(e) {} 
   }
 
-  // ================== PEERJS ==================
+  // ================== PEERJS EQUAL NETWORK ==================
   function setConnUI(status, sub, dotClass) {
     $('connStatus').textContent = status;
     $('connRoom').textContent = sub || '---';
@@ -381,14 +390,13 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 
     peer.on('open', function() {
       isHost = true;
-      setConnUI('Host Ativo', 'Você é a sala principal', 'on');
+      setConnUI('Conectado', 'Ministério RCC', 'on');
       broadcastData();
     });
 
     peer.on('connection', function(conn) {
       connections.push(conn);
       conn.on('open', function() {
-        toast('Instrumentista conectado!', 'info');
         conn.send({ type: 'sync', payload: data });
       });
       conn.on('data', function(d) { handleData(d, conn); });
@@ -410,43 +418,85 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
   }
 
   function becomeClient() {
-    setConnUI('Conectando...', 'Procurando sala', 'sync');
+    setConnUI('Conectando...', 'Ministério', 'sync');
     var clientId = 'rcc-client-' + uid();
     peer = new Peer(clientId, { debug: 1 });
 
     peer.on('open', function() {
       hostConn = peer.connect(FIXED_PEER_ID, { reliable: true });
-      hostConn.on('open', function() { setConnUI('Conectado', 'Ministério', 'on'); });
+      hostConn.on('open', function() { setConnUI('Conectado', 'Ministério RCC', 'on'); });
       hostConn.on('data', function(d) { handleData(d, hostConn); });
       hostConn.on('close', function() {
-        setConnUI('Sala saiu', 'Reconectando...', 'sync');
-        setTimeout(initNetwork, 3000);
+        setConnUI('Reconectando...', 'Ministério', 'sync');
+        setTimeout(initNetwork, 3000); // Tenta virar host
       });
       hostConn.on('error', function() { setTimeout(initNetwork, 3000); });
     });
   }
 
   function handleData(d, conn) {
-    if (d.type === 'update') {
-      if (isHost) { data = d.payload; saveLocal(); render(); broadcastData(); }
+    if (d.type === 'alert') {
+      toast(d.msg, 'alert');
+      if (isHost) {
+        // Repassa o aviso para todos os outros
+        connections.forEach(function(c) {
+          if (c.open && c !== conn) c.send({ type: 'alert', msg: d.msg });
+        });
+      }
+    } else if (d.type === 'update') {
+      if (isHost) {
+        data = d.payload;
+        saveLocal();
+        render();
+        broadcastData();
+      }
     } else if (d.type === 'sync') {
-      if (!isHost && d.payload.ts > data.ts) { data = d.payload; saveLocal(); render(); }
+      if (!isHost && d.payload.ts > data.ts) {
+        data = d.payload;
+        saveLocal();
+        render();
+      }
     }
   }
 
   function broadcastData() {
     if (!isHost) return;
-    connections.forEach(function(conn) { if (conn.open) conn.send({ type: 'sync', payload: data }); });
+    connections.forEach(function(conn) {
+      if (conn.open) conn.send({ type: 'sync', payload: data });
+    });
   }
 
   function syncData() {
     data.ts = Date.now();
     saveLocal();
     render();
-    if (isHost) broadcastData();
-    else if (hostConn && hostConn.open) hostConn.send({ type: 'update', payload: data });
-    else toast('Sem conexão. Salvo local.', 'err');
+    if (isHost) {
+      broadcastData();
+    } else if (hostConn && hostConn.open) {
+      hostConn.send({ type: 'update', payload: data });
+    }
   }
+
+  // ================== COMUNICAÇÃO (ALERTAS) ==================
+  $('btnAlert').addEventListener('click', function() {
+    var msg = prompt("Enviar aviso para a banda:");
+    if (msg && msg.trim()) {
+      msg = msg.trim();
+      toast(msg, 'alert'); // Mostra para si mesmo
+      
+      // Envia para a rede
+      var payload = { type: 'alert', msg: msg };
+      if (isHost) {
+        connections.forEach(function(conn) {
+          if (conn.open) conn.send(payload);
+        });
+      } else if (hostConn && hostConn.open) {
+        hostConn.send(payload);
+      } else {
+        toast('Sem conexão com a banda.', 'err');
+      }
+    }
+  });
 
   // ================== UI RENDERING ==================
   function renderChips() {
@@ -516,7 +566,7 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
         '</div>';
 
       card.addEventListener('click', function(e) {
-        if (e.target.closest('.btn-ico')) return; // Ignora se clicou nos botões
+        if (e.target.closest('.btn-ico')) return;
         openView(s.id);
       });
       card.querySelector('.edit').addEventListener('click', function(e) { e.stopPropagation(); openSong(s.id); });
