@@ -300,7 +300,7 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 
   // ================== CONFIG ==================
   var SLOTS = 10; // Máximo de dispositivos simultâneos
-  var SLOT_PREFIX = 'rcc-mesh-v6-slot-'; // ID base da rede
+  var SLOT_PREFIX = 'rcc-mesh-v7-slot-'; // ID base da rede
   
   // ================== STATE ==================
   var data = { cats: [], songs: [], ts: 0 };
@@ -310,10 +310,12 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 
   var peer = null;
   var myPeerId = null;
+  var mySlot = 0;
   var connections = {}; 
   var pending = {}; 
   var wakeLock = null;
   var seenAlerts = new Set();
+  var reconnectInterval = null;
 
   var $ = function(id) { return document.getElementById(id); };
 
@@ -360,15 +362,19 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
   });
 
   // ================== LOCAL STORAGE ==================
-  function saveLocal() { localStorage.setItem('setlist_data_v6', JSON.stringify(data)); }
+  function saveLocal() { 
+    localStorage.setItem('setlist_data_v7', JSON.stringify(data)); 
+    if (mySlot > 0) localStorage.setItem('rcc_mesh_myslot', mySlot);
+  }
   function loadLocal() { 
     try { 
-      var d = JSON.parse(localStorage.getItem('setlist_data_v6')); 
+      var d = JSON.parse(localStorage.getItem('setlist_data_v7')); 
       if (d && Array.isArray(d.songs)) data = d; 
+      mySlot = parseInt(localStorage.getItem('rcc_mesh_myslot') || '0');
     } catch(e) {} 
   }
 
-  // ================== REDE MESH (TODOS SÃO ADMIN) ==================
+  // ================== REDE MESH ==================
   function setConnUI(status, sub, dotClass) {
     $('connStatus').textContent = status;
     $('connRoom').textContent = sub || 'Ministério de Música';
@@ -384,57 +390,80 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
     var total = count + 1; // Eu + outros conectados
     if (myPeerId) {
       setConnUI('Conectado', 'Ministério de Música (' + total + ')', 'on');
-    } else {
-      setConnUI('Conectando...', 'Ministério de Música', 'sync');
     }
   }
 
   function findSlot() {
-    var slot = 1;
-    function trySlot(n) {
-      if (n > SLOTS) {
+    // Limpa tentativas anteriores
+    if (peer) { try { peer.destroy(); } catch(e) {} }
+    if (reconnectInterval) { clearInterval(reconnectInterval); reconnectInterval = null; }
+    
+    // Tenta o último slot usado primeiro, depois começa do 1
+    var startSlot = mySlot || 1;
+    trySlot(startSlot);
+  }
+
+  function trySlot(n) {
+    if (n > SLOTS) {
+      // Se percorreu todos, espera e tenta do 1
+      if (mySlot !== 0) {
+        mySlot = 0;
+        trySlot(1);
+      } else {
         setConnUI('Rede cheia', 'Aguarde alguém sair', 'err');
         setTimeout(function() { findSlot(); }, 10000);
-        return;
       }
-      var id = SLOT_PREFIX + n;
-      setConnUI('Conectando...', 'Ministério de Música', 'sync');
-      
-      var p = new Peer(id, { debug: 0 });
-
-      p.on('open', function() {
-        myPeerId = id;
-        peer = p;
-        setupPeerHandlers();
-        updateConnUI();
-        setTimeout(connectToAll, 500);
-        setInterval(connectToAll, 4000);
-      });
-
-      p.on('error', function(err) {
-        if (err.type === 'unavailable-id') {
-          try { p.destroy(); } catch(e) {}
-          trySlot(n + 1);
-        } else if (err.type === 'peer-unavailable') {
-          // Erro esperado ao tentar conectar em slots vazios. Ignorar para não causar loop.
-        } else {
-          setConnUI('Sem conexão', 'Reconectando...', 'err');
-          try { p.destroy(); } catch(e) {}
-          myPeerId = null;
-          setTimeout(function() { findSlot(); }, 4000);
-        }
-      });
-
-      p.on('disconnected', function() {
-        setConnUI('Desconectado', 'Reconectando...', 'sync');
-        try { 
-          p.reconnect(); 
-        } catch(e) {
-          setTimeout(function() { findSlot(); }, 3000);
-        }
-      });
+      return;
     }
-    trySlot(1);
+    
+    var id = SLOT_PREFIX + n;
+    setConnUI('Conectando...', 'Ministério de Música', 'sync');
+    
+    var p = new Peer(id, { debug: 0 });
+
+    p.on('open', function() {
+      mySlot = n;
+      localStorage.setItem('rcc_mesh_myslot', n);
+      myPeerId = id;
+      peer = p;
+      setupPeerHandlers();
+      updateConnUI();
+      
+      // Procura outros dispositivos
+      setTimeout(connectToAll, 1000);
+      // Verifica novos dispositivos a cada 8 segundos (evita sobrecarregar o servidor)
+      reconnectInterval = setInterval(connectToAll, 8000);
+    });
+
+    p.on('error', function(err) {
+      if (err.type === 'unavailable-id') {
+        try { p.destroy(); } catch(e) {}
+        trySlot(n + 1);
+      } else if (err.type === 'peer-unavailable') {
+        // Ignora erro ao tentar conectar em slots vazios
+      } else {
+        // Erro de rede ou servidor
+        setConnUI('Reconectando...', 'Ministério de Música', 'sync');
+        try { p.destroy(); } catch(e) {}
+        myPeerId = null;
+        setTimeout(function() { findSlot(); }, 4000);
+      }
+    });
+
+    p.on('disconnected', function() {
+      setConnUI('Reconectando...', 'Ministério de Música', 'sync');
+      // Tenta reconectar no mesmo slot sem destruir tudo
+      setTimeout(function() {
+        if (peer && peer.disconnected) {
+          try { 
+            peer.reconnect(); 
+          } catch(e) { 
+            myPeerId = null;
+            findSlot(); 
+          }
+        }
+      }, 2000);
+    });
   }
 
   function setupPeerHandlers() {
@@ -457,7 +486,7 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
   }
 
   function connectToAll() {
-    if (!peer || !myPeerId) return;
+    if (!peer || !myPeerId || peer.disconnected) return;
     for (var i = 1; i <= SLOTS; i++) {
       var id = SLOT_PREFIX + i;
       if (id === myPeerId) continue;
@@ -468,7 +497,7 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
   }
 
   function connectTo(id) {
-    if (!peer || connections[id] || pending[id]) return;
+    if (!peer || peer.disconnected || connections[id] || pending[id]) return;
     pending[id] = true;
 
     var conn;
@@ -484,7 +513,7 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
         delete pending[id];
         try { conn.close(); } catch(e) {}
       }
-    }, 3000);
+    }, 4000);
 
     conn.on('open', function() {
       clearTimeout(timeout);
