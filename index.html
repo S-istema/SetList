@@ -53,7 +53,6 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent-light); b
 input::placeholder, textarea::placeholder { color: var(--text-muted); }
 select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a7250' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; cursor: pointer; }
 
-/* Fundo Premium - Efeito Luz de Altar */
 .bg-effects { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; background: var(--bg-deep); }
 .bg-orb { position: absolute; border-radius: 50%; filter: blur(120px); }
 .bg-orb-1 { width: 500px; height: 500px; top: -150px; left: -100px; background: rgba(234, 88, 12, 0.25); animation: f1 25s ease-in-out infinite alternate; }
@@ -123,7 +122,7 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 .sc-artist .lyr-ico { color: var(--gold); font-size: 10px; }
 
 .sc-actions { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); display: flex; gap: 8px; opacity: 0; transition: opacity 0.2s; }
-.song-card:hover .sc-actions { opacity: 1; } /* Aparece no hover (desktop) */
+.song-card:hover .sc-actions { opacity: 1; }
 
 .btn-ico { background: rgba(0,0,0,0.4); border: 1px solid var(--border); color: var(--text-muted); font-size: 12px; font-weight: 600; padding: 8px 12px; border-radius: var(--r-xs); cursor: pointer; display: flex; align-items: center; gap: 6px; }
 .btn-ico:active { transform: scale(0.9); }
@@ -134,7 +133,6 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 .fab { position: fixed; bottom: 32px; right: 24px; width: 64px; height: 64px; border-radius: 20px; background: linear-gradient(135deg, var(--accent-light), var(--accent)); color: #fff; border: none; font-size: 26px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 60; box-shadow: 0 12px 35px rgba(249, 115, 22, 0.5); transition: transform 0.2s; }
 .fab:active { transform: scale(0.88) rotate(90deg); }
 
-/* Overlays (Bottom Sheets) */
 .overlay { position: fixed; inset: 0; z-index: 100; background: rgba(8, 5, 3, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); display: flex; align-items: flex-end; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
 .overlay.open { opacity: 1; pointer-events: all; }
 .sheet { background: var(--surface-solid); border: 1px solid var(--border); border-bottom: none; border-radius: 28px 28px 0 0; padding: 12px 24px 40px; width: 100%; max-width: 480px; max-height: 90dvh; overflow-y: auto; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1); box-shadow: 0 -10px 40px rgba(0,0,0,0.5); }
@@ -151,7 +149,6 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 .btn-primary:disabled { opacity: 0.3; cursor: not-allowed; }
 .btn-sec { background: var(--surface-2); color: var(--text-dim); border: 1px solid var(--border); margin-top: 12px; }
 
-/* FULL SCREEN VIEW */
 .view-overlay { position: fixed; inset: 0; z-index: 200; background: var(--bg-deep); background-image: radial-gradient(circle at 50% 0%, rgba(234, 88, 12, 0.15), transparent 60%); opacity: 0; pointer-events: none; transition: opacity 0.3s; display: flex; flex-direction: column; overflow: hidden; }
 .view-overlay.open { opacity: 1; pointer-events: all; }
 .view-header { padding: 24px 20px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); background: rgba(8,5,3,0.8); backdrop-filter: blur(15px); }
@@ -189,7 +186,6 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 <div class="bg-effects"><div class="bg-orb bg-orb-1"></div><div class="bg-orb bg-orb-2"></div><div class="bg-orb bg-orb-3"></div></div>
 <div class="toast-box" id="toasts"></div>
 
-<!-- Modal Categoria -->
 <div class="overlay" id="ovCat">
   <div class="sheet">
     <div class="handle"></div>
@@ -203,7 +199,6 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
   </div>
 </div>
 
-<!-- Modal Música -->
 <div class="overlay" id="ovSong">
   <div class="sheet">
     <div class="handle"></div>
@@ -237,15 +232,12 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
   </div>
 </div>
 
-<!-- Tela Cheia de Visualização -->
 <div class="view-overlay" id="ovView">
   <div class="view-header">
     <div class="view-title" id="viewTitle">Música</div>
     <button class="view-close" id="btnCloseView"><i class="fa-solid fa-xmark"></i></button>
   </div>
-  <div class="view-content" id="viewContent">
-    <!-- Contúdo injetado via JS -->
-  </div>
+  <div class="view-content" id="viewContent"></div>
   <div class="view-hint">Toque duas vezes na tela para fechar</div>
 </div>
 
@@ -270,7 +262,7 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
       <div class="conn-dot sync" id="connDot"></div>
       <div class="conn-info">
         <div class="conn-status" id="connStatus">Conectando...</div>
-        <div class="conn-room" id="connRoom">Ministério</div>
+        <div class="conn-room" id="connRoom">Ministério de Música</div>
       </div>
     </div>
   </div>
@@ -307,7 +299,13 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
   "use strict";
 
   // ================== CONFIG ==================
-  var FIXED_PEER_ID = 'rcc-renovacao-setlist-master-v4'; // ID fixo (Rede Igualitária)
+  var FIXED_ID = 'rcc-renovacao-master-v8'; // ID fixo do servidor
+  var peerConfig = {
+    'iceServers': [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'stun:stun1.l.google.com:19302' }
+    ]
+  };
   
   // ================== STATE ==================
   var data = { cats: [], songs: [], ts: 0 };
@@ -316,10 +314,12 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
   var editingId = null;
 
   var peer = null;
-  var connections = []; 
-  var hostConn = null; 
   var isHost = false;
+  var conns = []; // Conexões (se for host)
+  var hostConn = null; // Conexão com o host (se for cliente)
+  var onlineCount = 1;
   var wakeLock = null;
+  var seenAlerts = new Set();
 
   var $ = function(id) { return document.getElementById(id); };
 
@@ -333,12 +333,7 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
     var icon = type === 'err' ? 'fa-circle-xmark' : (type === 'info' ? 'fa-circle-info' : (type === 'alert' ? 'fa-bullhorn' : 'fa-circle-check'));
     t.innerHTML = '<i class="fa-solid ' + icon + '"></i>' + esc(msg);
     $('toasts').appendChild(t);
-    
-    // Vibração para alertas
-    if (type === 'alert' && navigator.vibrate) {
-      navigator.vibrate([100, 50, 100]);
-    }
-    
+    if (type === 'alert' && navigator.vibrate) navigator.vibrate([100, 50, 100]);
     setTimeout(function() { if (t.parentNode) t.remove(); }, 4000);
   }
 
@@ -365,136 +360,194 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
     if (wakeLock !== null && document.visibilityState === 'visible') {
       try { wakeLock = await navigator.wakeLock.request('screen'); } catch(e) {}
     }
+    if (document.visibilityState === 'visible' && peer && peer.disconnected) {
+      try { peer.reconnect(); } catch(e) {}
+    }
   });
 
   // ================== LOCAL STORAGE ==================
-  function saveLocal() { localStorage.setItem('setlist_data_v4', JSON.stringify(data)); }
+  function saveLocal() { localStorage.setItem('setlist_data_v8', JSON.stringify(data)); }
   function loadLocal() { 
     try { 
-      var d = JSON.parse(localStorage.getItem('setlist_data_v4')); 
+      var d = JSON.parse(localStorage.getItem('setlist_data_v8')); 
       if (d && Array.isArray(d.songs)) data = d; 
     } catch(e) {} 
   }
 
-  // ================== PEERJS EQUAL NETWORK ==================
+  // ================== NETWORK (HOST FAILSAFE) ==================
   function setConnUI(status, sub, dotClass) {
     $('connStatus').textContent = status;
-    $('connRoom').textContent = sub || '---';
+    $('connRoom').textContent = sub || 'Ministério de Música';
     $('connDot').className = 'conn-dot ' + dotClass;
   }
 
+  function updateConnUI() {
+    if (isHost) {
+      var openConns = conns.filter(c => c.open).length;
+      onlineCount = 1 + openConns;
+      setConnUI('Conectado', 'Ministério de Música (' + onlineCount + ')', 'on');
+      broadcast({ type: 'count', count: onlineCount });
+    } else {
+      setConnUI('Conectado', 'Ministério de Música (' + onlineCount + ')', 'on');
+    }
+  }
+
   function initNetwork() {
-    if (peer) peer.destroy();
-    setConnUI('Conectando...', 'Ministério', 'sync');
-    peer = new Peer(FIXED_PEER_ID, { debug: 1 });
+    if (peer) { try { peer.destroy(); } catch(e){} }
+    setConnUI('Conectando...', 'Ministério de Música', 'sync');
+    
+    peer = new Peer(FIXED_ID, { debug: 0, config: peerConfig });
 
     peer.on('open', function() {
       isHost = true;
-      setConnUI('Conectado', 'Ministério RCC', 'on');
-      broadcastData();
+      conns = [];
+      onlineCount = 1;
+      updateConnUI();
     });
 
     peer.on('connection', function(conn) {
-      connections.push(conn);
+      conns.push(conn);
       conn.on('open', function() {
         conn.send({ type: 'sync', payload: data });
+        updateConnUI();
       });
       conn.on('data', function(d) { handleData(d, conn); });
       conn.on('close', function() {
-        connections = connections.filter(function(c) { return c !== conn; });
+        conns = conns.filter(c => c !== conn);
+        updateConnUI();
+      });
+      conn.on('error', function() {
+        conns = conns.filter(c => c !== conn);
+        updateConnUI();
       });
     });
 
     peer.on('error', function(err) {
       if (err.type === 'unavailable-id') {
+        // O host já existe, virar cliente
         isHost = false;
-        peer.destroy();
+        try { peer.destroy(); } catch(e) {}
         becomeClient();
+      } else if (err.type === 'peer-unavailable') {
+        // Ignora erro de tentativa de conexão com host desligado
       } else {
-        setConnUI('Desconectado', 'Sem internet', 'err');
-        setTimeout(initNetwork, 5000);
+        setConnUI('Reconectando...', 'Ministério de Música', 'sync');
+        try { peer.destroy(); } catch(e) {}
+        setTimeout(initNetwork, 3000);
+      }
+    });
+
+    peer.on('disconnected', function() {
+      setConnUI('Reconectando...', 'Ministério de Música', 'sync');
+      try { 
+        peer.reconnect(); 
+      } catch(e) { 
+        setTimeout(initNetwork, 3000); 
       }
     });
   }
 
   function becomeClient() {
-    setConnUI('Conectando...', 'Ministério', 'sync');
     var clientId = 'rcc-client-' + uid();
-    peer = new Peer(clientId, { debug: 1 });
+    peer = new Peer(clientId, { debug: 0, config: peerConfig });
 
     peer.on('open', function() {
-      hostConn = peer.connect(FIXED_PEER_ID, { reliable: true });
-      hostConn.on('open', function() { setConnUI('Conectado', 'Ministério RCC', 'on'); });
-      hostConn.on('data', function(d) { handleData(d, hostConn); });
-      hostConn.on('close', function() {
-        setConnUI('Reconectando...', 'Ministério', 'sync');
-        setTimeout(initNetwork, 3000); // Tenta virar host
+      hostConn = peer.connect(FIXED_ID, { reliable: true });
+      
+      var timeout = setTimeout(function() {
+        if (!hostConn.open) {
+          try { hostConn.close(); } catch(e) {}
+          try { peer.destroy(); } catch(e) {}
+          initNetwork(); // Host pode ter caído, tentar virar host
+        }
+      }, 4000);
+
+      hostConn.on('open', function() {
+        clearTimeout(timeout);
+        onlineCount = 1; // Temporário até o host enviar o real
+        setConnUI('Conectado', 'Ministério de Música (1)', 'on');
       });
-      hostConn.on('error', function() { setTimeout(initNetwork, 3000); });
+
+      hostConn.on('data', function(d) { handleData(d, hostConn); });
+
+      hostConn.on('close', function() {
+        clearTimeout(timeout);
+        setConnUI('Reconectando...', 'Ministério de Música', 'sync');
+        try { peer.destroy(); } catch(e) {}
+        setTimeout(initNetwork, 1000); // Tentar virar host
+      });
+
+      hostConn.on('error', function() {
+        clearTimeout(timeout);
+        try { peer.destroy(); } catch(e) {}
+        setTimeout(initNetwork, 1000);
+      });
+    });
+
+    peer.on('error', function(err) {
+      if (err.type === 'peer-unavailable') {
+        try { peer.destroy(); } catch(e) {}
+        setTimeout(initNetwork, 1000); // Host caiu, tentar virar host
+      } else {
+        setConnUI('Reconectando...', 'Ministério de Música', 'sync');
+        try { peer.destroy(); } catch(e) {}
+        setTimeout(becomeClient, 3000);
+      }
     });
   }
 
   function handleData(d, conn) {
-    if (d.type === 'alert') {
-      toast(d.msg, 'alert');
-      if (isHost) {
-        // Repassa o aviso para todos os outros
-        connections.forEach(function(c) {
-          if (c.open && c !== conn) c.send({ type: 'alert', msg: d.msg });
-        });
-      }
-    } else if (d.type === 'update') {
-      if (isHost) {
+    if (d.type === 'sync') {
+      if (d.payload.ts > data.ts) {
         data = d.payload;
         saveLocal();
         render();
-        broadcastData();
+        if (isHost) broadcast({ type: 'sync', payload: data }, conn);
+      } else if (d.payload.ts < data.ts) {
+        if (conn.open) conn.send({ type: 'sync', payload: data });
       }
-    } else if (d.type === 'sync') {
-      if (!isHost && d.payload.ts > data.ts) {
-        data = d.payload;
-        saveLocal();
-        render();
+    } else if (d.type === 'alert') {
+      if (!seenAlerts.has(d.alertId)) {
+        seenAlerts.add(d.alertId);
+        toast(d.msg, 'alert');
+        if (isHost) broadcast(d, conn);
+      }
+    } else if (d.type === 'count') {
+      if (!isHost) {
+        onlineCount = d.count;
+        updateConnUI();
       }
     }
   }
 
-  function broadcastData() {
-    if (!isHost) return;
-    connections.forEach(function(conn) {
-      if (conn.open) conn.send({ type: 'sync', payload: data });
-    });
+  function broadcast(msg, exceptConn) {
+    if (isHost) {
+      conns.forEach(function(c) {
+        if (c.open && c !== exceptConn) {
+          try { c.send(msg); } catch(e) {}
+        }
+      });
+    } else if (hostConn && hostConn.open) {
+      try { hostConn.send(msg); } catch(e) {}
+    }
   }
 
   function syncData() {
     data.ts = Date.now();
     saveLocal();
     render();
-    if (isHost) {
-      broadcastData();
-    } else if (hostConn && hostConn.open) {
-      hostConn.send({ type: 'update', payload: data });
-    }
+    broadcast({ type: 'sync', payload: data });
   }
 
-  // ================== COMUNICAÇÃO (ALERTAS) ==================
+  // ================== ALERTAS ==================
   $('btnAlert').addEventListener('click', function() {
     var msg = prompt("Enviar aviso para a banda:");
     if (msg && msg.trim()) {
       msg = msg.trim();
-      toast(msg, 'alert'); // Mostra para si mesmo
-      
-      // Envia para a rede
-      var payload = { type: 'alert', msg: msg };
-      if (isHost) {
-        connections.forEach(function(conn) {
-          if (conn.open) conn.send(payload);
-        });
-      } else if (hostConn && hostConn.open) {
-        hostConn.send(payload);
-      } else {
-        toast('Sem conexão com a banda.', 'err');
-      }
+      var alertId = uid();
+      seenAlerts.add(alertId);
+      toast(msg, 'alert');
+      broadcast({ type: 'alert', msg: msg, alertId: alertId });
     }
   });
 
@@ -536,13 +589,17 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
     $('emptyMsg').classList.toggle('hidden', list.length > 0);
     $('listCount').textContent = list.length;
     var catObj = data.cats.find(function(c) { return c.id === activeCat; });
-    $('listTitle').textContent = activeCat === 'all' ? 'Todas as Músicas' : (catObj ? catObj.name : '—');
+    $('listTitle').textContent = activeCat === 'all' ? 'Todas as Músicas' : (catObj ? catObj.name : 'Músicas');
 
     if (list.length === 0 && searchTerm) {
       $('emptyMsg').innerHTML = '<i class="fa-solid fa-magnifying-glass"></i>Nenhum resultado para "' + esc(searchTerm) + '".';
       $('emptyMsg').classList.remove('hidden');
     } else if (list.length === 0) {
-      $('emptyMsg').innerHTML = '<i class="fa-regular fa-folder-open"></i>Nenhuma música aqui ainda.<br>Toque no <strong>+</strong> para começar.';
+      if (data.cats.length === 0) {
+        $('emptyMsg').innerHTML = '<i class="fa-regular fa-folder-open"></i>Crie uma categoria e adicione suas músicas.<br>Toque no <strong>+</strong> para começar.';
+      } else {
+        $('emptyMsg').innerHTML = '<i class="fa-regular fa-folder-open"></i>Nenhuma música aqui ainda.<br>Toque no <strong>+</strong> para começar.';
+      }
     }
 
     list.forEach(function(s, i) {
@@ -628,14 +685,11 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
   function closeView() { $('ovView').classList.remove('open'); }
   $('btnCloseView').addEventListener('click', closeView);
 
-  // Double tap to close
   var lastTap = 0;
   $('ovView').addEventListener('touchend', function(e) {
     var now = Date.now();
     var diff = now - lastTap;
-    if (diff < 300 && diff > 0) {
-      closeView();
-    }
+    if (diff < 300 && diff > 0) closeView();
     lastTap = now;
   });
   $('ovView').addEventListener('dblclick', closeView);
@@ -675,7 +729,11 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
   });
 
   function openSong(id) {
-    if (data.cats.length === 0) addCat('Geral');
+    if (data.cats.length === 0) {
+      toast('Crie uma categoria primeiro', 'err');
+      openCat();
+      return;
+    }
     updateCatSelect();
     editingId = id || null;
     if (editingId) {
@@ -791,6 +849,10 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
     }
     
     doc.save('SetList_RCC.pdf'); toast('PDF gerado');
+  });
+
+  window.addEventListener('beforeunload', function() {
+    if (peer) { try { peer.destroy(); } catch(e) {} }
   });
 
   // ================== INIT ==================
