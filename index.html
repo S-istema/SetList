@@ -262,7 +262,7 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
       <div class="conn-dot sync" id="connDot"></div>
       <div class="conn-info">
         <div class="conn-status" id="connStatus">Conectando...</div>
-        <div class="conn-room" id="connRoom">Ministério</div>
+        <div class="conn-room" id="connRoom">Ministério de Música</div>
       </div>
     </div>
   </div>
@@ -299,8 +299,8 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
   "use strict";
 
   // ================== CONFIG ==================
-  var SLOTS = 15; // Máximo de dispositivos simultâneos na rede mesh
-  var SLOT_PREFIX = 'rcc-mesh-slot-';
+  var SLOTS = 10; // Máximo de dispositivos simultâneos
+  var SLOT_PREFIX = 'rcc-mesh-v6-slot-'; // ID base da rede
   
   // ================== STATE ==================
   var data = { cats: [], songs: [], ts: 0 };
@@ -310,8 +310,8 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 
   var peer = null;
   var myPeerId = null;
-  var connections = {}; // peerId -> DataConnection
-  var pending = {}; // peerId -> boolean (tentativas de conexão em andamento)
+  var connections = {}; 
+  var pending = {}; 
   var wakeLock = null;
   var seenAlerts = new Set();
 
@@ -354,17 +354,16 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
     if (wakeLock !== null && document.visibilityState === 'visible') {
       try { wakeLock = await navigator.wakeLock.request('screen'); } catch(e) {}
     }
-    // Reconectar ao voltar para o app
     if (document.visibilityState === 'visible' && peer && peer.disconnected) {
       try { peer.reconnect(); } catch(e) {}
     }
   });
 
   // ================== LOCAL STORAGE ==================
-  function saveLocal() { localStorage.setItem('setlist_data_v4', JSON.stringify(data)); }
+  function saveLocal() { localStorage.setItem('setlist_data_v6', JSON.stringify(data)); }
   function loadLocal() { 
     try { 
-      var d = JSON.parse(localStorage.getItem('setlist_data_v4')); 
+      var d = JSON.parse(localStorage.getItem('setlist_data_v6')); 
       if (d && Array.isArray(d.songs)) data = d; 
     } catch(e) {} 
   }
@@ -372,7 +371,7 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
   // ================== REDE MESH (TODOS SÃO ADMIN) ==================
   function setConnUI(status, sub, dotClass) {
     $('connStatus').textContent = status;
-    $('connRoom').textContent = sub || '---';
+    $('connRoom').textContent = sub || 'Ministério de Música';
     $('connDot').className = 'conn-dot ' + dotClass;
   }
 
@@ -381,17 +380,15 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
     Object.keys(connections).forEach(function(id) {
       if (connections[id] && connections[id].open) count++;
     });
-    if (count > 0) {
-      setConnUI('Conectado', count + ' dispositivo' + (count > 1 ? 's' : '') + ' na rede', 'on');
-    } else if (myPeerId) {
-      setConnUI('Online', 'Aguardando a banda...', 'on');
+    
+    var total = count + 1; // Eu + outros conectados
+    if (myPeerId) {
+      setConnUI('Conectado', 'Ministério de Música (' + total + ')', 'on');
     } else {
-      setConnUI('Conectando...', 'Ministério', 'sync');
+      setConnUI('Conectando...', 'Ministério de Música', 'sync');
     }
   }
 
-  // Cada dispositivo tenta ocupar um "slot" fixo (1 a 15)
-  // O primeiro slot livre se torna o ID deste peer
   function findSlot() {
     var slot = 1;
     function trySlot(n) {
@@ -401,6 +398,8 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
         return;
       }
       var id = SLOT_PREFIX + n;
+      setConnUI('Conectando...', 'Ministério de Música', 'sync');
+      
       var p = new Peer(id, { debug: 0 });
 
       p.on('open', function() {
@@ -408,32 +407,29 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
         peer = p;
         setupPeerHandlers();
         updateConnUI();
-        // Conectar a todos os outros slots
-        setTimeout(connectToAll, 300);
-        // Verificar novos peers periodicamente
-        setInterval(connectToAll, 5000);
+        setTimeout(connectToAll, 500);
+        setInterval(connectToAll, 4000);
       });
 
       p.on('error', function(err) {
         if (err.type === 'unavailable-id') {
-          // Slot ocupado, tenta o próximo
-          p.destroy();
+          try { p.destroy(); } catch(e) {}
           trySlot(n + 1);
         } else if (err.type === 'peer-unavailable') {
-          // Esperado ao tentar conectar com slots vazios - ignora
+          // Erro esperado ao tentar conectar em slots vazios. Ignorar para não causar loop.
         } else {
           setConnUI('Sem conexão', 'Reconectando...', 'err');
-          setTimeout(function() {
-            try { p.destroy(); } catch(e) {}
-            myPeerId = null;
-            findSlot();
-          }, 3000);
+          try { p.destroy(); } catch(e) {}
+          myPeerId = null;
+          setTimeout(function() { findSlot(); }, 4000);
         }
       });
 
       p.on('disconnected', function() {
         setConnUI('Desconectado', 'Reconectando...', 'sync');
-        try { p.reconnect(); } catch(e) {
+        try { 
+          p.reconnect(); 
+        } catch(e) {
           setTimeout(function() { findSlot(); }, 3000);
         }
       });
@@ -441,13 +437,11 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
     trySlot(1);
   }
 
-  // Recebe conexões de outros peers
   function setupPeerHandlers() {
     peer.on('connection', function(conn) {
       conn.on('open', function() {
         connections[conn.peer] = conn;
         updateConnUI();
-        // Envia nossos dados para o novo peer
         conn.send({ type: 'sync', payload: data });
       });
       conn.on('data', function(d) { handleData(d, conn); });
@@ -462,7 +456,6 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
     });
   }
 
-  // Tenta conectar a todos os outros slots
   function connectToAll() {
     if (!peer || !myPeerId) return;
     for (var i = 1; i <= SLOTS; i++) {
@@ -491,14 +484,13 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
         delete pending[id];
         try { conn.close(); } catch(e) {}
       }
-    }, 4000);
+    }, 3000);
 
     conn.on('open', function() {
       clearTimeout(timeout);
       delete pending[id];
       connections[id] = conn;
       updateConnUI();
-      // Troca dados
       conn.send({ type: 'sync', payload: data });
     });
 
@@ -518,26 +510,20 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
     });
   }
 
-  // Processa dados recebidos de outros peers
   function handleData(d, conn) {
     if (d.type === 'sync') {
       if (d.payload.ts > data.ts) {
-        // Dados do outro peer são mais recentes, adota
         data = d.payload;
         saveLocal();
         render();
       } else if (d.payload.ts < data.ts) {
-        // Nossos dados são mais recentes, envia de volta
         if (conn.open) conn.send({ type: 'sync', payload: data });
       }
-      // Se ts for igual, não faz nada (já sincronizado)
     } else if (d.type === 'alert') {
       if (!seenAlerts.has(d.alertId)) {
         seenAlerts.add(d.alertId);
         toast(d.msg, 'alert');
-        // Repassa o aviso para os outros peers
         broadcast(d, conn);
-        // Limpa alertas antigos para não estourar a memória
         if (seenAlerts.size > 100) {
           var arr = Array.from(seenAlerts);
           seenAlerts = new Set(arr.slice(-50));
@@ -546,7 +532,6 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
     }
   }
 
-  // Envia mensagem para todos os peers conectados (exceto um específico)
   function broadcast(msg, exceptConn) {
     Object.keys(connections).forEach(function(id) {
       var c = connections[id];
@@ -556,7 +541,6 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
     });
   }
 
-  // Sincroniza mudanças locais com a rede
   function syncData() {
     data.ts = Date.now();
     saveLocal();
@@ -614,13 +598,17 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
     $('emptyMsg').classList.toggle('hidden', list.length > 0);
     $('listCount').textContent = list.length;
     var catObj = data.cats.find(function(c) { return c.id === activeCat; });
-    $('listTitle').textContent = activeCat === 'all' ? 'Todas as Músicas' : (catObj ? catObj.name : '—');
+    $('listTitle').textContent = activeCat === 'all' ? 'Todas as Músicas' : (catObj ? catObj.name : 'Músicas');
 
     if (list.length === 0 && searchTerm) {
       $('emptyMsg').innerHTML = '<i class="fa-solid fa-magnifying-glass"></i>Nenhum resultado para "' + esc(searchTerm) + '".';
       $('emptyMsg').classList.remove('hidden');
     } else if (list.length === 0) {
-      $('emptyMsg').innerHTML = '<i class="fa-regular fa-folder-open"></i>Nenhuma música aqui ainda.<br>Toque no <strong>+</strong> para começar.';
+      if (data.cats.length === 0) {
+        $('emptyMsg').innerHTML = '<i class="fa-regular fa-folder-open"></i>Crie uma categoria e adicione suas músicas.<br>Toque no <strong>+</strong> para começar.';
+      } else {
+        $('emptyMsg').innerHTML = '<i class="fa-regular fa-folder-open"></i>Nenhuma música aqui ainda.<br>Toque no <strong>+</strong> para começar.';
+      }
     }
 
     list.forEach(function(s, i) {
@@ -750,7 +738,11 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
   });
 
   function openSong(id) {
-    if (data.cats.length === 0) addCat('Geral');
+    if (data.cats.length === 0) {
+      toast('Crie uma categoria primeiro', 'err');
+      openCat();
+      return;
+    }
     updateCatSelect();
     editingId = id || null;
     if (editingId) {
@@ -868,7 +860,6 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
     doc.save('SetList_RCC.pdf'); toast('PDF gerado');
   });
 
-  // Limpa o peer ao sair
   window.addEventListener('beforeunload', function() {
     if (peer) { try { peer.destroy(); } catch(e) {} }
   });
